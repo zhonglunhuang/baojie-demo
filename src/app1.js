@@ -20,14 +20,14 @@ const ROLE_TABS = {
   sales:   ['repairNew','shop','orders','notifs'],
   receiver:['receive','handover','overview','notifs'],
   tech:    ['work','handover','overview','notifs'],
-  stock:   ['inv','review','pricing','txns','overview','notifs'],
+  stock:   ['scan','inv','review','pricing','txns','overview','notifs'],
   finance: ['recon','overview','notifs'],
 };
 const TAB_LABELS = {
   repairNew:'維修申請', shop:'配件商城', orders:'我的訂單', notifs:'通知',
   receive:'收件點收', handover:'取件／寄送作業', overview:'流程總覽',
   work:'維修工作台', inv:'庫存管理', review:'收單／預購審查',
-  pricing:'價目表維護', txns:'異動記錄', recon:'對帳作業',
+  pricing:'價目表維護', txns:'異動記錄', recon:'對帳作業', scan:'📷 掃碼作業',
 };
 
 const PERSONA = {
@@ -99,8 +99,19 @@ let cart = []; // 購物車（不落地）
 
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 function load(){
-  try{ const s = localStorage.getItem(LS_KEY); if(s){ state = JSON.parse(s); return true; } }catch(e){}
+  try{ const s = localStorage.getItem(LS_KEY); if(s){ state = JSON.parse(s); migrate(); return true; } }catch(e){}
   return false;
+}
+/* 舊版 localStorage 資料補上新欄位（條碼／自訂品項） */
+function migrate(){
+  if(!state.barcodes) state.barcodes = defaultBarcodes();
+  if(!state.customItems) state.customItems = [];
+  if(state.seq.c == null) state.seq.c = 0;
+}
+function defaultBarcodes(){
+  const b = {};
+  CATALOG.forEach((c,i)=>{ b[codeForIndex(i)] = c.id; });
+  return b;
 }
 function resetDemo(){
   if(!confirm('確定要清除所有操作、恢復示範初始資料？')) return;
@@ -131,7 +142,8 @@ function wBadge(w){
     ? `<span class="badge b-green">🟢 保固內（至 ${fmtDate(w.end)}）</span>`
     : `<span class="badge b-red">🔴 已過保（過期 ${w.overdue} 天）</span>`;
 }
-function cat(id){ return CATALOG.find(c=>c.id===id); }
+function cat(id){ return CATALOG.find(c=>c.id===id) || (state && state.customItems || []).find(c=>c.id===id); }
+function allItems(){ return CATALOG.concat(state.customItems || []); }
 function kindOf(role){ return role==='sales' ? 'biz' : 'cust'; }
 function price(id, kind){ const p = state.pricing[id]; return p ? p[kind] : null; }
 

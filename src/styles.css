@@ -90,4 +90,20 @@ button.ghost.hd{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgb
 .notif.unread{background:#e8f1fd;border-left-color:#e74c3c}
 .notif .t{font-weight:700}
 .notif .ts{font-size:11px;color:#8a93a3}
+.scanwrap{position:relative;max-width:440px;background:#0b1220;border-radius:12px;overflow:hidden;aspect-ratio:4/3}
+.scanwrap video{width:100%;height:100%;object-fit:cover;display:block}
+.scanframe{position:absolute;inset:14% 16%;border:2px solid rgba(255,255,255,.9);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none}
+.scanframe::after{content:'';position:absolute;left:4%;right:4%;top:50%;height:2px;background:rgba(231,76,60,.85)}
+.bc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.bc-card{border:1px solid #e2e6ee;border-radius:10px;padding:12px;text-align:center;background:#fff}
+.bc-card svg{max-width:100%;height:auto}
+.card{overflow-x:auto}
+@media (max-width:640px){
+  main{margin:10px auto;padding:0 8px 60px}
+  .card{padding:12px}
+  th,td{padding:6px 6px;font-size:12px}
+  header{padding:8px 10px}
+  .modal{padding:14px}
+  .overlay{padding:14px 6px}
+}
 @media print{header,nav,.btn{display:none!important}}

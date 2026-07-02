@@ -4,7 +4,7 @@ import pathlib
 src = pathlib.Path(__file__).parent
 out = src.parent / 'index.html'
 css = (src / 'styles.css').read_text(encoding='utf-8')
-js = '\n'.join((src / f'app{i}.js').read_text(encoding='utf-8') for i in range(1, 7))
+js = '\n'.join((src / f'app{i}.js').read_text(encoding='utf-8') for i in range(1, 8))
 html = f'''<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>

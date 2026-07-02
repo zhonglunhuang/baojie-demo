@@ -15,9 +15,10 @@ function invParts(){
   return `${lows.length?`<div class="warnbox">⚠️ <b>低庫存提醒</b>：${lows.map(c=>c.name).join('、')} 合計庫存 ≤ 安全庫存，前台已自動切換為「預購」。</div>`:''}
   <p class="note">「安」＝該倉安全庫存量。合計 ≤ 安全庫存合計 → 前台自動轉「預購」。每筆異動皆需操作人員並寫入流水帳。</p>
   <table><thead><tr><th>品項</th><th>北部</th><th>中部</th><th>南部</th><th>合計</th><th>前台狀態</th><th></th></tr></thead><tbody>
-  ${CATALOG.map(c=>{
+  ${allItems().map(c=>{
     const e = state.inv.parts[c.id], t = partTotals(c.id);
-    return `<tr><td>${c.name}</td>
+    const bc = barcodeOf(c.id);
+    return `<tr><td>${c.name}${c.custom?' <span class="badge b-blue">自訂</span>':''}${bc?`<div class="note">條碼 ${bc}</div>`:''}</td>
       ${WHS.map(w=>`<td class="${e[w].q<=e[w].s?'low':''}">${e[w].q}<span class="note">/安${e[w].s}</span></td>`).join('')}
       <td><b>${t.q}</b><span class="note">/安${t.s}</span></td>
       <td>${fsBadge(c.id)}</td>
@@ -233,6 +234,3 @@ function vTxns(){
   </tbody></table></div>`;
 }
 
-/* ============== 初始化 ============== */
-if(!load()) seed();
-render();

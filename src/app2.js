@@ -15,9 +15,11 @@ function seed(){
 
   state = {
     role:'customer', tab:'repairNew', invTab:'parts',
-    seq:{ r:3, s:1, n:0 },
+    seq:{ r:3, s:1, n:0, c:0 },
     pricing,
     inv:{ parts },
+    barcodes: defaultBarcodes(),
+    customItems: [],
     machines: [
       { name:'全新機器',   north:12, central:5, south:4, tNC:0, tNS:0 },
       { name:'業務備機',   north:6,  central:3, south:3, tNC:0, tNS:0 },
@@ -140,6 +142,7 @@ function setTab(t){ state.tab = t; save(); render(); }
 function setInvTab(t){ state.invTab = t; save(); render(); }
 
 function render(){
+  if(typeof window.__scanActive === 'function') window.__scanActive(); // 離開掃碼頁時關閉相機
   const sel = $('roleSel');
   sel.innerHTML = Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${state.role===k?'selected':''}>${v}</option>`).join('');
   const tabs = ROLE_TABS[state.role];
@@ -151,7 +154,7 @@ function render(){
   const V = {
     repairNew:vRepairNew, shop:vShop, orders:vOrders, notifs:vNotifs,
     receive:vReceive, handover:vHandover, overview:vOverview, work:vWork,
-    inv:vInventory, review:vReview, pricing:vPricing, txns:vTxns, recon:vRecon,
+    inv:vInventory, review:vReview, pricing:vPricing, txns:vTxns, recon:vRecon, scan:vScan,
   };
   $('view').innerHTML = (V[state.tab]||vOverview)();
   const c = unreadCount();
