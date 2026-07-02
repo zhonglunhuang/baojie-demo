@@ -107,6 +107,7 @@ function migrate(){
   if(!state.barcodes) state.barcodes = defaultBarcodes();
   if(!state.customItems) state.customItems = [];
   if(state.seq.c == null) state.seq.c = 0;
+  if(!state.machineReg) state.machineReg = seedMachines();
 }
 function defaultBarcodes(){
   const b = {};

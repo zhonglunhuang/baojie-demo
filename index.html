@@ -243,6 +243,7 @@ function migrate(){
   if(!state.barcodes) state.barcodes = defaultBarcodes();
   if(!state.customItems) state.customItems = [];
   if(state.seq.c == null) state.seq.c = 0;
+  if(!state.machineReg) state.machineReg = seedMachines();
 }
 function defaultBarcodes(){
   const b = {};
@@ -338,6 +339,7 @@ function seed(){
     inv:{ parts },
     barcodes: defaultBarcodes(),
     customItems: [],
+    machineReg: seedMachines(),
     machines: [
       { name:'全新機器',   north:12, central:5, south:4, tNC:0, tNS:0 },
       { name:'業務備機',   north:6,  central:3, south:3, tNC:0, tNS:0 },
@@ -1642,8 +1644,8 @@ window.__scanActive = function(){ if(scanning && state.tab !== 'scan') stopScan(
 function vScan(){
   const native = ('BarcodeDetector' in window);
   return `<div class="card"><h3>📷 掃碼庫存作業</h3>
-  <p class="note">手機開啟本頁（需 HTTPS，GitHub Pages 網址即可）→「開始掃描」→ 對準商品條碼。<br>
-  ✅ 有庫存 → 選擇 出貨／入庫／盤點／調撥；❓ 查無 → 新增品項或綁定到既有品項。
+  <p class="note">手機開啟本頁（需 HTTPS，GitHub Pages 網址即可）→「開始掃描」→ 對準<b>商品條碼</b>或<b>機身序號條碼</b>（如 4664-004688）。<br>
+  ✅ 配件 → 出貨／入庫／盤點／調撥；🖥️ 機器序號 → 出貨交機／調撥／DEMO借出／保固查詢；❓ 查無 → 詢問是否新增庫存。
   ${native ? '' : '<br>⚠️ 此瀏覽器不支援原生條碼辨識，掃描時將自動載入 ZXing 函式庫（iPhone Safari 適用）。'}</p>
   <div class="scanwrap"><video id="scanVideo" playsinline muted autoplay></video><div class="scanframe"></div></div>
   <div id="scanMsg" class="note mt"></div>
@@ -1740,14 +1742,141 @@ function manualLookup(){
   handleCode(c);
 }
 
-/* ── 掃到條碼：判斷有無庫存 ── */
+/* ── 掃到條碼：判斷有無庫存（配件條碼 → 機器序號 → 查無） ── */
+function normCode(c){ return String(c).trim().toUpperCase().replace(/[^0-9A-Z]/g,''); }
+function lookupPart(code){
+  if(state.barcodes[code]) return state.barcodes[code];
+  const n = normCode(code);
+  for(const [c,id] of Object.entries(state.barcodes)) if(normCode(c)===n) return id;
+  return null;
+}
+function lookupMachine(code){
+  const n = normCode(code);
+  return state.machineReg.find(m=>normCode(m.sn)===n);
+}
 function handleCode(code){
-  const id = state.barcodes[code];
-  const rec = { ts:Date.now(), code, item:(id && cat(id)) ? cat(id).name : null, action:null };
+  code = String(code).trim();
+  const rec = { ts:Date.now(), code, item:null, action:null };
   lastScans.unshift(rec);
-  if(id && state.inv.parts[id]) openItemAction(code, id, rec);
-  else openBindOrCreate(code, rec);
+  const id = lookupPart(code);
+  if(id && state.inv.parts[id]){
+    rec.item = cat(id).name;
+    openItemAction(code, id, rec);
+  } else {
+    const m = lookupMachine(code);
+    if(m){ rec.item = `${m.model}（機器）`; openMachineAction(m.sn, rec); }
+    else openBindOrCreate(code, rec);
+  }
   render();
+}
+
+/* ============== 機器序號追蹤（單台建檔） ============== */
+const MACHINE_MODEL_DEFAULT = 'Roboclean SPlus / 114K1';
+function seedMachines(){
+  const now = new Date();
+  return [
+    { sn:'4664-004688', model:'Roboclean SPlus / 114K1', type:'全新機器', wh:'north', status:'在庫',
+      history:[{ ts:Date.now()-86400000*7, action:'進倉建檔', staff:'張控存' }] },
+    { sn:'4664-003125', model:'Roboclean SPlus / 114K1', type:'全新機器', wh:'north', status:'已出貨',
+      owner:'王小明', shipDate: iso(addMonths(now,-10)),
+      history:[{ ts:Date.now()-86400000*300, action:'進倉建檔', staff:'張控存' },
+               { ts:addMonths(now,-10).getTime(), action:'出貨交機 王小明', staff:'李佳玲' }] },
+  ];
+}
+const M_STATUS = { '在庫':'b-green', '已出貨':'b-blue', '借出中':'b-amber' };
+function machineRow(m){ return state.machines.find(r=>r.name===m.type); }
+
+function openMachineAction(sn, rec){
+  const m = state.machineReg.find(x=>x.sn===sn);
+  scanCtx = { sn, rec };
+  const w = m.shipDate ? warranty(m.shipDate) : null;
+  let loc = '';
+  if(m.status==='在庫') loc = `${WH_LABEL[m.wh]}倉`;
+  if(m.status==='已出貨') loc = `客戶：${esc(m.owner||'—')}`;
+  if(m.status==='借出中') loc = `借用人：${esc(m.borrower||'—')}（原倉 ${WH_LABEL[m.wh]}）`;
+  let h = `<h3>🖥️ 已找到機器</h3>
+  <div class="okbox"><b style="font-size:16px">${esc(m.model)}</b>　<span class="badge b-gray">${esc(m.type)}</span>
+  <span class="badge ${M_STATUS[m.status]}">${m.status}</span><br>
+  <span class="note" style="font-family:monospace">序號 ${esc(m.sn)}</span></div>
+  <div class="kv"><b>位置／持有</b>${loc}
+  ${m.shipDate ? `<br><b>出貨日期</b>${fmtDate(m.shipDate)}　${wBadge(w)}` : ''}</div>
+  <h4>機器歷程</h4>
+  <table><thead><tr><th>時間</th><th>動作</th><th>操作人員</th></tr></thead><tbody>
+  ${m.history.slice().reverse().map(x=>`<tr><td class="note">${fmtDT(x.ts)}</td><td>${esc(x.action)}</td><td>${esc(x.staff)}</td></tr>`).join('')}
+  </tbody></table>`;
+  if(m.status==='在庫'){
+    h += `<h4>請選擇作業</h4>
+    <div class="pill-tabs">
+      <div class="pill" id="ma_ship" onclick="mAct('ship')">🚚 出貨交機</div>
+      <div class="pill" id="ma_move" onclick="mAct('move')">🔁 調撥</div>
+      <div class="pill" id="ma_lend" onclick="mAct('lend')">🤝 DEMO借出</div>
+    </div><div id="maForm"></div>`;
+  } else {
+    h += `<div class="mt flexrow">
+      <button class="btn" onclick="mAct('return')">↩️ ${m.status==='已出貨'?'返廠入庫':'歸還入庫'}</button>
+      ${m.status==='已出貨' ? '<span class="note">維修收件時掃序號即可核對保固。</span>' : ''}
+    </div><div id="maForm"></div>`;
+  }
+  openModal(h);
+  if(m.status==='在庫') mAct('ship');
+}
+function mAct(t){
+  scanCtx.act = t;
+  ['ship','move','lend'].forEach(k=>{ const p = $('ma_'+k); if(p) p.className = 'pill' + (k===t?' on':''); });
+  let f = '<div class="grid2 mt">';
+  if(t==='ship') f += `<div class="field"><span>交機對象（客戶／業務）*</span><input id="ma_owner" style="width:100%"></div>
+    <div class="field"><span>出貨日期 *（保固起算）</span><input type="date" id="ma_date" value="${todayISO()}" style="width:100%"></div>`;
+  if(t==='move') f += `<div class="field"><span>調撥至 *</span><select id="ma_to" style="width:100%">${WHS.map(w=>`<option value="${w}">${WH_LABEL[w]}倉庫</option>`).join('')}</select></div>`;
+  if(t==='lend') f += `<div class="field"><span>借用業務／借用人 *</span><input id="ma_borrower" style="width:100%"></div>`;
+  f += `<div class="field"><span>操作人員姓名 *</span><input id="ma_staff" style="width:100%"></div></div>
+  <button class="btn green" onclick="submitMachineAct()">確認${{ship:'出貨交機',move:'調撥',lend:'借出',return:'入庫'}[t]}</button>`;
+  $('maForm').innerHTML = f;
+}
+function submitMachineAct(){
+  const { sn, rec, act } = scanCtx;
+  const m = state.machineReg.find(x=>x.sn===sn);
+  const staff = $('ma_staff').value.trim();
+  if(!staff) return toast('請填寫操作人員姓名');
+  const row = machineRow(m);
+  const label = `${m.type}（${m.model}）`;
+  if(act==='ship'){
+    const owner = $('ma_owner').value.trim(), date = $('ma_date').value;
+    if(!owner || !date) return toast('請填寫交機對象與出貨日期');
+    m.status = '已出貨'; m.owner = owner; m.shipDate = date;
+    if(row) row[m.wh] = Math.max(0, row[m.wh]-1);
+    m.history.push({ ts:Date.now(), action:'出貨交機 '+owner, staff });
+    logTxn('機器出貨', label, WH_LABEL[m.wh], -1, staff, '', `序號 ${m.sn}｜交機 ${owner}｜保固至 ${warranty(date).end}`);
+    rec.action = '出貨交機 '+owner;
+  } else if(act==='move'){
+    const to = $('ma_to').value;
+    if(to===m.wh) return toast('調撥來源與目的相同');
+    if(row){ row[m.wh] = Math.max(0, row[m.wh]-1); row[to]++; }
+    m.history.push({ ts:Date.now(), action:`調撥 ${WH_LABEL[m.wh]}→${WH_LABEL[to]}`, staff });
+    logTxn('調撥', label, `${WH_LABEL[m.wh]}→${WH_LABEL[to]}`, 1, staff, '', `序號 ${m.sn}（掃碼）`);
+    rec.action = `調撥 ${WH_LABEL[m.wh]}→${WH_LABEL[to]}`;
+    m.wh = to;
+  } else if(act==='lend'){
+    const borrower = $('ma_borrower').value.trim();
+    if(!borrower) return toast('請填寫借用人');
+    m.status = '借出中'; m.borrower = borrower;
+    if(row) row[m.wh] = Math.max(0, row[m.wh]-1);
+    const dtype = m.type==='租賃Demo' ? 'Demo機租賃' : (m.type.includes('拍打頭') ? '借DEMO拍打頭' : '借DEMO主機');
+    state.demoLog.unshift({ date:todayISO(), type:dtype, person:borrower, qty:1, note:'掃碼借出｜序號 '+m.sn, staff, ts:Date.now() });
+    m.history.push({ ts:Date.now(), action:'DEMO借出 '+borrower, staff });
+    logTxn('DEMO借出', label, WH_LABEL[m.wh], -1, staff, '', `序號 ${m.sn}｜借用 ${borrower}`);
+    rec.action = 'DEMO借出 '+borrower;
+  } else if(act==='return'){
+    const from = m.status;
+    if(from==='借出中'){
+      state.demoLog.unshift({ date:todayISO(), type:'借DEMO主機', person:m.borrower||'—', qty:1, note:'歸還｜序號 '+m.sn, staff, ts:Date.now() });
+    }
+    m.status = '在庫'; m.borrower = null;
+    if(row) row[m.wh]++;
+    m.history.push({ ts:Date.now(), action:(from==='已出貨'?'返廠入庫':'歸還入庫'), staff });
+    logTxn('機器入庫', label, WH_LABEL[m.wh], 1, staff, '', `序號 ${m.sn}｜${from==='已出貨'?'返廠':'歸還'}`);
+    rec.action = from==='已出貨' ? '返廠入庫' : '歸還入庫';
+  }
+  save(); toast('✅ ' + rec.action + '，已寫入流水帳'); closeModal(); render();
 }
 
 /* ── 有庫存：出貨／入庫／盤點／調撥 ── */
@@ -1828,14 +1957,53 @@ function submitScanAct(){
 /* ── 查無條碼：先詢問是否新增庫存 ── */
 function openBindOrCreate(code, rec){
   scanCtx = { code, rec };
+  const likelySN = /[-A-Za-z]/.test(code) || !/^\d{13}$/.test(code); // 含破折號/字母或非EAN-13 → 較可能是機器序號
   openModal(`<h3>❓ 查無此條碼</h3>
-  <div class="warnbox">條碼 <b style="font-family:monospace">${esc(code)}</b> 不在庫存系統中。</div>
-  <p style="font-size:16px;margin:14px 0"><b>是否要新增此庫存品項？</b></p>
+  <div class="warnbox">條碼 <b style="font-family:monospace">${esc(code)}</b> 不在庫存系統中。${likelySN?'<br><span class="note">格式類似機器序號（如 4664-004688）。</span>':''}</p></div>
+  <p style="font-size:16px;margin:14px 0"><b>是否要新增此庫存？</b></p>
   <div class="flexrow">
-    <button class="btn green" onclick="openCreateForm()">✅ 是，新增庫存</button>
+    ${likelySN
+      ? `<button class="btn green" onclick="openCreateMachine()">✅ 是，新增機器（序號建檔）</button>
+         <button class="btn" onclick="openCreateForm()">📦 是，新增配件品項</button>`
+      : `<button class="btn green" onclick="openCreateForm()">✅ 是，新增配件品項</button>
+         <button class="btn" onclick="openCreateMachine()">🖥️ 是，新增機器（序號建檔）</button>`}
     <button class="btn ghost" onclick="cancelNotFound()">❌ 否，取消</button>
   </div>
   <p class="note mt">此條碼其實是既有商品（如新包裝、原廠國際條碼）？<a href="javascript:openBindForm()">改為綁定到既有品項 →</a></p>`);
+}
+function openCreateMachine(){
+  const { code } = scanCtx;
+  openModal(`<h3>🖥️ 新增機器（序號建檔）</h3>
+  <div class="infobox">以掃描到的序號為此台機器建立唯一追蹤檔案（型號登錄）。</div>
+  <div class="grid2">
+    <div class="field"><span>機器序號 *</span><input id="nm_sn" value="${esc(code)}" style="width:100%;font-family:monospace"></div>
+    <div class="field"><span>機器型號 *</span><input id="nm_model" value="${MACHINE_MODEL_DEFAULT}" style="width:100%"></div>
+    <div class="field"><span>機器類型 *</span><select id="nm_type" style="width:100%">${state.machines.map(r=>`<option>${r.name}</option>`).join('')}</select></div>
+    <div class="field"><span>進倉位置 *</span><select id="nm_wh" style="width:100%">${WHS.map(w=>`<option value="${w}">${WH_LABEL[w]}倉庫</option>`).join('')}</select></div>
+    <div class="field"><span>進倉點收人員姓名 *</span><input id="nm_staff" style="width:100%"></div>
+    <div class="field"><span>備註</span><input id="nm_note" style="width:100%"></div>
+  </div>
+  <div class="flexrow">
+    <button class="btn green" onclick="createMachineFromScan()">建檔並入庫</button>
+    <button class="btn ghost" onclick="openBindOrCreate(scanCtx.code, scanCtx.rec)">← 返回</button>
+  </div>`);
+}
+function createMachineFromScan(){
+  const { rec } = scanCtx;
+  const sn = $('nm_sn').value.trim(), model = $('nm_model').value.trim(), staff = $('nm_staff').value.trim();
+  if(!sn) return toast('請填寫機器序號');
+  if(!model) return toast('請填寫機器型號');
+  if(!staff) return toast('請填寫點收人員姓名');
+  if(lookupMachine(sn)) return toast('此序號已建檔');
+  const type = $('nm_type').value, wh = $('nm_wh').value, note = $('nm_note').value.trim();
+  const m = { sn, model, type, wh, status:'在庫',
+    history:[{ ts:Date.now(), action:'進倉建檔' + (note?'｜'+note:''), staff }] };
+  state.machineReg.push(m);
+  const row = machineRow(m); if(row) row[wh]++;
+  logTxn('機器入庫', `${type}（${model}）`, WH_LABEL[wh], 1, staff, '', `序號 ${sn}｜掃碼建檔`);
+  rec.item = `${model}（機器）`; rec.action = '序號建檔入庫';
+  save(); toast('✅ 機器 ' + sn + ' 已建檔入庫');
+  openMachineAction(sn, rec); render();
 }
 function cancelNotFound(){
   scanCtx.rec.action = '取消';
@@ -1898,17 +2066,41 @@ function createItemFromScan(){
 }
 
 /* ── 條碼清單（供另一台裝置顯示／列印） ── */
+function code39Svg(text){
+  const map = { '0':'000110100','1':'100100001','2':'001100001','3':'101100000','4':'000110001',
+    '5':'100110000','6':'001110000','7':'000100101','8':'100100100','9':'001100100',
+    '-':'010000101','*':'010010100' };
+  const t = '*' + String(text).toUpperCase() + '*';
+  const nw = 2, ww = 5, h = 56;
+  let x = 10, rects = '';
+  for(const ch of t){
+    const p = map[ch]; if(!p) continue;
+    for(let i=0;i<9;i++){
+      const w = p[i]==='1' ? ww : nw;
+      if(i%2===0) rects += `<rect x="${x}" y="0" width="${w}" height="${h}"/>`;
+      x += w;
+    }
+    x += nw;
+  }
+  const W = x + 10;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${h+16}" viewBox="0 0 ${W} ${h+16}"><rect width="${W}" height="${h+16}" fill="#fff"/><g fill="#000">${rects}</g><text x="${W/2}" y="${h+13}" font-size="12" text-anchor="middle" font-family="monospace">${esc(text)}</text></svg>`;
+}
 function openBarcodeSheet(){
-  const cards = allItems().map(c=>{
+  const partCards = allItems().map(c=>{
     const code = barcodeOf(c.id);
     if(!code) return '';
-    const svg = /^\d{13}$/.test(code) ? ean13Svg(code)
-      : `<div style="font-family:monospace;padding:16px 8px;border:1px dashed #bbb;border-radius:8px;word-break:break-all">${esc(code)}</div>`;
+    const svg = /^\d{13}$/.test(code) ? ean13Svg(code) : code39Svg(code);
     return `<div class="bc-card"><b>${esc(c.name)}</b><div class="mt">${svg}</div></div>`;
   }).join('');
+  const mCards = state.machineReg.map(m=>
+    `<div class="bc-card"><b>${esc(m.model)}</b> <span class="badge ${M_STATUS[m.status]}">${m.status}</span><div class="mt">${code39Svg(m.sn)}</div></div>`
+  ).join('');
   openModal(`<h3>📋 品項條碼清單</h3>
-  <p class="note">用另一台裝置開啟此清單供手機掃描測試，或列印貼於貨架／商品上。（EAN-13 格式，可直接被掃描）</p>
-  <div class="bc-grid">${cards}</div>`);
+  <p class="note">用另一台裝置開啟此清單供手機掃描測試，或列印貼於貨架／商品上。</p>
+  <h4>🖥️ 機器序號（Code 39，同機身標籤格式）</h4>
+  <div class="bc-grid">${mCards}</div>
+  <h4 class="mt">📦 配件品項（EAN-13）</h4>
+  <div class="bc-grid">${partCards}</div>`);
 }
 
 /* ============== 初始化 ============== */

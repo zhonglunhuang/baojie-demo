@@ -20,6 +20,7 @@ function seed(){
     inv:{ parts },
     barcodes: defaultBarcodes(),
     customItems: [],
+    machineReg: seedMachines(),
     machines: [
       { name:'全新機器',   north:12, central:5, south:4, tNC:0, tNS:0 },
       { name:'業務備機',   north:6,  central:3, south:3, tNC:0, tNS:0 },
