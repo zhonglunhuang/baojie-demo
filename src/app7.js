@@ -218,18 +218,27 @@ function submitScanAct(){
   save(); toast('✅ ' + rec.action + '，已寫入流水帳'); closeModal(); render();
 }
 
-/* ── 查無條碼：新增品項或綁定 ── */
+/* ── 查無條碼：先詢問是否新增庫存 ── */
 function openBindOrCreate(code, rec){
   scanCtx = { code, rec };
   openModal(`<h3>❓ 查無此條碼</h3>
-  <div class="warnbox">條碼 <b style="font-family:monospace">${esc(code)}</b> 尚未建檔，請選擇處理方式。</div>
-  <h4>方式一：綁定到既有品項</h4>
-  <p class="note">此條碼對應的商品已在系統中（例如新包裝、國際條碼），綁定後之後掃描即可直接作業。</p>
+  <div class="warnbox">條碼 <b style="font-family:monospace">${esc(code)}</b> 不在庫存系統中。</div>
+  <p style="font-size:16px;margin:14px 0"><b>是否要新增此庫存品項？</b></p>
   <div class="flexrow">
-    <select id="bd_item" style="max-width:240px">${allItems().map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select>
-    <button class="btn" onclick="bindCode()">綁定條碼</button>
+    <button class="btn green" onclick="openCreateForm()">✅ 是，新增庫存</button>
+    <button class="btn ghost" onclick="cancelNotFound()">❌ 否，取消</button>
   </div>
-  <h4 class="mt">方式二：新增庫存品項</h4>
+  <p class="note mt">此條碼其實是既有商品（如新包裝、原廠國際條碼）？<a href="javascript:openBindForm()">改為綁定到既有品項 →</a></p>`);
+}
+function cancelNotFound(){
+  scanCtx.rec.action = '取消';
+  save(); closeModal(); render();
+  toast('已取消，可繼續掃描');
+}
+function openCreateForm(){
+  const { code } = scanCtx;
+  openModal(`<h3>➕ 新增庫存品項</h3>
+  <div class="infobox">將綁定條碼 <b style="font-family:monospace">${esc(code)}</b></div>
   <div class="grid2">
     <div class="field"><span>品項名稱 *</span><input id="nw_name" placeholder="如：新款濾心" style="width:100%"></div>
     <div class="field"><span>進倉點收人員姓名 *</span><input id="nw_staff" style="width:100%"></div>
@@ -238,7 +247,20 @@ function openBindOrCreate(code, rec){
     <div class="field"><span>南部初始數量</span><input type="number" id="nw_s" value="0" min="0" style="width:100%"></div>
     <div class="field"><span>安全庫存量（各倉套用）</span><input type="number" id="nw_safe" value="2" min="0" style="width:100%"></div>
   </div>
-  <button class="btn green" onclick="createItemFromScan()">新增品項並入庫</button>`);
+  <div class="flexrow">
+    <button class="btn green" onclick="createItemFromScan()">新增品項並入庫</button>
+    <button class="btn ghost" onclick="openBindOrCreate(scanCtx.code, scanCtx.rec)">← 返回</button>
+  </div>`);
+}
+function openBindForm(){
+  const { code } = scanCtx;
+  openModal(`<h3>🔗 綁定到既有品項</h3>
+  <div class="infobox">將條碼 <b style="font-family:monospace">${esc(code)}</b> 綁定到系統中的既有品項，之後掃描即可直接作業。</div>
+  <div class="flexrow">
+    <select id="bd_item" style="max-width:240px">${allItems().map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select>
+    <button class="btn" onclick="bindCode()">綁定條碼</button>
+    <button class="btn ghost" onclick="openBindOrCreate(scanCtx.code, scanCtx.rec)">← 返回</button>
+  </div>`);
 }
 function bindCode(){
   const { code, rec } = scanCtx;
