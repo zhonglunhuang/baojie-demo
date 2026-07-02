@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>寶傑營運管理系統 Demo</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:-apple-system,"PingFang TC","Heiti TC","Microsoft JhengHei",sans-serif;background:#eef1f6;color:#1f2937;font-size:14px}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#123a63,#1e5b8f);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:10px 20px;gap:12px;flex-wrap:wrap}
+.hd-left{display:flex;align-items:center}
+.logo{background:#fff;color:#123a63;font-weight:800;border-radius:8px;padding:6px 10px;margin-right:10px;font-size:16px}
+.ttl{font-weight:700;font-size:16px}
+.sub{font-size:11px;opacity:.8}
+.hd-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hd-right label{font-size:12px;opacity:.85}
+#roleSel{border:none;border-radius:8px;padding:7px 10px;font:inherit;font-weight:600;color:#123a63}
+.bell{position:relative;background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:15px;color:#fff}
+.cnt{position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;border-radius:999px;font-size:10px;font-weight:700;padding:1px 5px;display:none}
+nav#tabs{display:flex;gap:2px;background:#fff;border-bottom:1px solid #e2e6ee;padding:0 16px;overflow-x:auto}
+.tab{padding:12px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;color:#5b6572;font-weight:500}
+.tab:hover{color:#1e5b8f}
+.tab.on{color:#1e5b8f;border-color:#1e5b8f;font-weight:700}
+main{max-width:1180px;margin:20px auto;padding:0 16px 60px}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:18px;margin-bottom:16px}
+.card h3{margin-bottom:10px;font-size:15px;color:#123a63}
+.card h4{margin:12px 0 8px;font-size:13px;color:#374151}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.b-green{background:#e7f6ec;color:#1a7f37}
+.b-red{background:#fdebec;color:#c0392b}
+.b-amber{background:#fff4e0;color:#b45309}
+.b-blue{background:#e8f1fd;color:#1d6fd1}
+.b-purple{background:#f3e8fd;color:#7e3ff2}
+.b-teal{background:#e0f5f4;color:#0f766e}
+.b-gray{background:#eef0f4;color:#556}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid #eef0f4;text-align:left;vertical-align:middle}
+th{background:#f8fafc;font-size:12px;color:#5b6572;font-weight:600}
+tr:hover td{background:#fafbfd}
+input,select,textarea{border:1px solid #d4dae4;border-radius:8px;padding:8px 10px;font:inherit;background:#fff;max-width:100%}
+input[type=checkbox],input[type=radio]{width:15px;height:15px;padding:0;vertical-align:-2px;accent-color:#1e5b8f}
+textarea{width:100%;min-height:64px}
+input:focus,select:focus,textarea:focus{outline:2px solid #a8c7e8;border-color:#1e5b8f}
+label.opt{display:inline-flex;align-items:center;gap:6px;margin:4px 12px 4px 0;cursor:pointer}
+.field{margin-bottom:10px}
+.field>span{display:block;font-size:12px;color:#5b6572;margin-bottom:4px;font-weight:600}
+.btn{background:#1e5b8f;color:#fff;border:none;border-radius:8px;padding:9px 16px;font:inherit;cursor:pointer;font-weight:600}
+.btn:hover{background:#174a75}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.ghost{background:#fff;color:#1e5b8f;border:1px solid #9dbcd8}
+.btn.ghost:hover{background:#f0f6fb}
+.btn.warn{background:#c0392b}.btn.warn:hover{background:#a53125}
+.btn.green{background:#1a7f37}.btn.green:hover{background:#15682d}
+.btn.amber{background:#d97706}.btn.amber:hover{background:#b45309}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button.ghost.hd{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:7px 12px;font:inherit;cursor:pointer;font-size:12px}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:100}
+.modal{background:#fff;border-radius:14px;max-width:880px;width:100%;padding:22px;position:relative;margin-bottom:40px}
+.mclose{position:absolute;top:12px;right:14px;background:#eef0f4;border:none;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;color:#556}
+.steps{display:flex;margin:14px 0 4px;flex-wrap:wrap;row-gap:10px}
+.step{flex:1;min-width:86px;text-align:center;position:relative;font-size:12px;color:#8a93a3;padding-top:28px}
+.step::before{content:attr(data-n);position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:22px;line-height:22px;border-radius:50%;background:#e2e6ee;color:#667;font-weight:700;font-size:11px}
+.step::after{content:'';position:absolute;top:11px;left:calc(50% + 14px);width:calc(100% - 28px);height:2px;background:#e2e6ee}
+.step:last-child::after{display:none}
+.step.done{color:#1a7f37}
+.step.done::before{background:#1a7f37;color:#fff;content:'✓'}
+.step.done::after{background:#9fd6ae}
+.step.now{color:#1e5b8f;font-weight:700}
+.step.now::before{background:#1e5b8f;color:#fff}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.item-card{border:1px solid #e2e6ee;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;background:#fff}
+.item-card .nm{font-weight:700}
+.item-card .pr{color:#123a63;font-weight:700;font-size:15px}
+.warnbox{background:#fdf3e7;border:1px solid #f2c288;border-radius:10px;padding:12px;margin:10px 0;color:#8a5a10}
+.okbox{background:#e7f6ec;border:1px solid #9fd6ae;border-radius:10px;padding:12px;margin:10px 0;color:#1a5c2c}
+.infobox{background:#e8f1fd;border:1px solid #b5d2f2;border-radius:10px;padding:12px;margin:10px 0;color:#174a75}
+.note{font-size:12px;color:#7b8494}
+.kv{font-size:13px;line-height:2}
+.kv b{color:#374151;margin-right:4px}
+.sec{border-top:1px dashed #dfe3ea;margin-top:14px;padding-top:12px}
+.sec>h4{margin-top:0}
+.pill-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:6px 14px;border-radius:999px;background:#eef0f4;cursor:pointer;font-size:13px;color:#556;font-weight:500}
+.pill.on{background:#1e5b8f;color:#fff;font-weight:700}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#123a63;color:#fff;padding:11px 20px;border-radius:10px;z-index:300;box-shadow:0 4px 16px rgba(0,0,0,.25);font-weight:600;animation:tfade 2.6s forwards}
+@keyframes tfade{0%{opacity:0;transform:translate(-50%,10px)}10%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+.qr{width:110px;height:110px;border:1px solid #ddd;border-radius:8px}
+.low{color:#c0392b;font-weight:700}
+.right{text-align:right}
+.center{text-align:center}
+.mt{margin-top:12px}
+.flexrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.guide-ol{padding-left:20px;line-height:2}
+.guide-ol b{color:#123a63}
+.notif{border-left:3px solid #1e5b8f;background:#f8fafc;border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:8px}
+.notif.unread{background:#e8f1fd;border-left-color:#e74c3c}
+.notif .t{font-weight:700}
+.notif .ts{font-size:11px;color:#8a93a3}
+@media print{header,nav,.btn{display:none!important}}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="hd-left"><span class="logo">寶傑</span><div><div class="ttl">營運管理系統 Demo</div><div class="sub">維修單管理 × 配件販售 × 庫存管理（純前端模擬）</div></div></div>
+  <div class="hd-right">
+    <label>目前角色</label>
+    <select id="roleSel" autocomplete="off" onchange="setRole(this.value)"></select>
+    <button class="bell" onclick="setTab('notifs')" title="通知">🔔<span id="bellCnt" class="cnt"></span></button>
+    <button class="ghost hd" onclick="openGuide()">📖 流程指南</button>
+    <button class="ghost hd" onclick="resetDemo()">重置示範資料</button>
+  </div>
+</header>
+<nav id="tabs"></nav>
+<main id="view"></main>
+<div id="overlay" class="overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal"><button class="mclose" onclick="closeModal()">✕</button><div id="modalBody"></div></div>
+</div>
+<script>
+/* ================= 常數 ================= */
+const WARRANTY_YEARS = 2;      // 保固年限（Demo 預設 2 年）
+const INSPECT_FEE = 300;       // 過保送檢費+檢測費
+const SHIP_FEE = 200;          // 寄件運費
+
+const OFFICES = {
+  north:  { name: '北部維修部門／辦事處', addr: '台北市內湖區瑞光路 123 號 5 樓' },
+  central:{ name: '中部辦事處',           addr: '台中市西屯區台灣大道二段 456 號' },
+  south:  { name: '南部辦事處',           addr: '高雄市前鎮區中山二路 789 號' },
+};
+const WH_LABEL = { north:'北部', central:'中部', south:'南部' };
+const WHS = ['north','central','south'];
+
+const ROLES = {
+  customer:'客戶', sales:'業務', receiver:'收件/點收人員',
+  tech:'維修人員', stock:'控存人員', finance:'核帳/財務人員',
+};
+const ROLE_TABS = {
+  customer:['repairNew','shop','orders','notifs'],
+  sales:   ['repairNew','shop','orders','notifs'],
+  receiver:['receive','handover','overview','notifs'],
+  tech:    ['work','handover','overview','notifs'],
+  stock:   ['inv','review','pricing','txns','overview','notifs'],
+  finance: ['recon','overview','notifs'],
+};
+const TAB_LABELS = {
+  repairNew:'維修申請', shop:'配件商城', orders:'我的訂單', notifs:'通知',
+  receive:'收件點收', handover:'取件／寄送作業', overview:'流程總覽',
+  work:'維修工作台', inv:'庫存管理', review:'收單／預購審查',
+  pricing:'價目表維護', txns:'異動記錄', recon:'對帳作業',
+};
+
+const PERSONA = {
+  customer:{ name:'王小明', phone:'0912-345-678', addr:'台北市大安區和平東路一段 100 號' },
+  sales:   { name:'李佳玲（業務）', phone:'0987-654-321', addr:'台中市北區進化路 50 號' },
+};
+
+/* 全局價目表主資料：biz=業務價 cust=客戶價 null=待補 / bizOnly=業務專用 */
+const CATALOG = [
+  { id:'p1',  name:'圓刷',              biz:950,   cust:950,   repair:true, sale:true },
+  { id:'p2',  name:'地板刷',            biz:950,   cust:950,   repair:true, sale:true },
+  { id:'p3',  name:'機器濾網',          biz:300,   cust:450,   repair:true, sale:true },
+  { id:'p4',  name:'T型刷',             biz:350,   cust:350,   repair:true, sale:true },
+  { id:'p5',  name:'遙控器',            biz:2700,  cust:2700,  repair:true, sale:true },
+  { id:'p6',  name:'噴氣頭',            biz:250,   cust:250,   repair:true, sale:true },
+  { id:'p7',  name:'細縫刷',            biz:500,   cust:500,   repair:true, sale:true },
+  { id:'p8',  name:'機器背蓋',          biz:500,   cust:900,   repair:true },
+  { id:'p9',  name:'機器水盆',          biz:3000,  cust:3000,  repair:true },
+  { id:'p10', name:'主機刷子',          biz:250,   cust:250,   repair:true },
+  { id:'p11', name:'拍打頭接觸線',      biz:1200,  cust:1200,  repair:true },
+  { id:'p12', name:'大噴瓶',            biz:400,   cust:400,   repair:true, sale:true },
+  { id:'p13', name:'帶電軟管(不含遙控器)', biz:9000, cust:9000, repair:true, note:'二手價 $6,300' },
+  { id:'p14', name:'帶電軟管(含遙控器)',  biz:12000, cust:12000, repair:true },
+  { id:'p15', name:'捲線器',            biz:1800,  cust:1800,  repair:true },
+  { id:'p16', name:'附輪底座',          biz:null,  cust:null,  repair:true, tbd:true },
+  { id:'p17', name:'鋼管(一支)',        biz:null,  cust:null,  repair:true, tbd:true },
+  { id:'p20', name:'觸控面板',          biz:null,  cust:null,  repair:true, tbd:true },
+  { id:'p21', name:'膠條',              biz:null,  cust:null,  repair:true, tbd:true },
+  { id:'p22', name:'原廠消毒水',        biz:350,   cust:400,   sale:true },
+  { id:'p23', name:'制服',              biz:600,   cust:null,  sale:true, bizOnly:true },
+  { id:'p24', name:'手電筒',            biz:350,   cust:null,  sale:true, bizOnly:true },
+  { id:'p25', name:'紙本單',            biz:500,   cust:null,  sale:true, bizOnly:true },
+  { id:'p26', name:'寵物包',            biz:1800,  cust:null,  sale:true, bizOnly:true },
+  { id:'p27', name:'雨罩',              biz:200,   cust:null,  sale:true, bizOnly:true },
+  { id:'p28', name:'萊潔消毒水',        biz:170,   cust:null,  sale:true, bizOnly:true },
+  { id:'p29', name:'名片',              biz:340,   cust:null,  sale:true, bizOnly:true },
+];
+
+/* 階段1 維修項目勾選清單（主機/拍打頭需填型號） */
+const REPAIR_ITEMS = ['主機','拍打頭','圓刷','地板刷','機器濾網','T型刷','遙控器','噴氣頭','細縫刷',
+  '機器背蓋','機器水盆','主機刷子','拍打頭接觸線','大噴瓶','帶電軟管(不含遙控器)','帶電軟管(含遙控器)',
+  '捲線器','附輪底座','鋼管(一支)','觸控面板','膠條'];
+
+const RSTATUS = {
+  submitted: ['待收件','b-blue'],   received: ['維修檢測中','b-purple'],
+  quoted:    ['已報價待回覆','b-amber'], paid: ['待對帳','b-purple'],
+  reconciled:['待取件／寄送','b-teal'],  closed: ['已結案','b-green'],
+};
+const SSTATUS = {
+  pending_payment:['待付款','b-amber'], pending_recon:['待對帳','b-purple'],
+  pending_stock: ['待收單備貨','b-blue'], ready:['備貨完成','b-teal'], closed:['已結案','b-green'],
+};
+const RSTEPS = ['申請送件','收件點收','檢測維修','發送報價','付款/取件方式','對帳結案'];
+const SSTEPS = ['線上下單','完成付款','對帳確認','收單備貨','完成'];
+const RDONE = { submitted:1, received:2, quoted:4, paid:5, reconciled:5, closed:6 };
+const SDONE = { pending_payment:1, pending_recon:2, pending_stock:3, ready:4, closed:5 };
+const R_ACTOR = { submitted:'收件/點收人員', received:'維修人員', quoted:'客戶/業務',
+  paid:'核帳/財務人員', reconciled:'點收/維修人員', closed:'—' };
+const S_ACTOR = { pending_payment:'客戶/業務', pending_recon:'核帳/財務人員',
+  pending_stock:'控存人員', ready:'控存人員(結案)', closed:'—' };
+
+const UNI_STYLES = ['舊款男版','舊款女版','備用版圓領T','新版通用版'];
+const UNI_SIZES  = ['XS','S','M','L','XL','2XL','3XL'];
+
+/* ================= 狀態 ================= */
+const LS_KEY = 'baojie_demo_v1';
+let state = null;
+let cart = []; // 購物車（不落地）
+
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function load(){
+  try{ const s = localStorage.getItem(LS_KEY); if(s){ state = JSON.parse(s); return true; } }catch(e){}
+  return false;
+}
+function resetDemo(){
+  if(!confirm('確定要清除所有操作、恢復示範初始資料？')) return;
+  localStorage.removeItem(LS_KEY); location.reload();
+}
+
+/* ================= 工具 ================= */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function money(n){ return '$' + Number(n||0).toLocaleString(); }
+function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function todayISO(){ return iso(new Date()); }
+function addMonths(d, m){ const x = new Date(d); x.setMonth(x.getMonth()+m); return x; }
+function fmtDate(s){ return s ? s.replace(/-/g,'/') : '—'; }
+function fmtDT(ts){ const d = new Date(ts); return iso(d).replace(/-/g,'/') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function toast(msg){ const t = document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2600); }
+
+function warranty(shipDate){
+  if(!shipDate) return null;
+  const end = new Date(shipDate); end.setFullYear(end.getFullYear() + WARRANTY_YEARS);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = Math.floor((now - end) / 86400000);
+  return { inW: diff <= 0, end: iso(end), overdue: diff > 0 ? diff : 0 };
+}
+function wBadge(w){
+  if(!w) return '<span class="badge b-gray">未填出貨日期</span>';
+  return w.inW
+    ? `<span class="badge b-green">🟢 保固內（至 ${fmtDate(w.end)}）</span>`
+    : `<span class="badge b-red">🔴 已過保（過期 ${w.overdue} 天）</span>`;
+}
+function cat(id){ return CATALOG.find(c=>c.id===id); }
+function kindOf(role){ return role==='sales' ? 'biz' : 'cust'; }
+function price(id, kind){ const p = state.pricing[id]; return p ? p[kind] : null; }
+
+function partTotals(id){
+  const e = state.inv.parts[id]; if(!e) return {q:0,s:0};
+  let q=0,s=0; WHS.forEach(w=>{ q+=e[w].q; s+=e[w].s; });
+  return {q,s};
+}
+function frontStatus(id){ const t = partTotals(id); return t.q > t.s ? '現貨' : '預購'; }
+function fsBadge(id){ return frontStatus(id)==='現貨' ? '<span class="badge b-green">現貨</span>' : '<span class="badge b-amber">預購</span>'; }
+
+/* ================= 通知 ================= */
+function notify(roles, title, body, ref){
+  state.notifs.unshift({ id:'n'+(++state.seq.n), ts:Date.now(), roles, title, body, ref:ref||null, read:false });
+}
+function unreadCount(){ return state.notifs.filter(n=>n.roles.includes(state.role) && !n.read).length; }
+function openRef(ref){
+  if(!ref) return;
+  if(ref[0]==='R' && state.repairs.find(r=>r.id===ref)) openRepair(ref);
+  else if(ref[0]==='S' && state.sales.find(s=>s.id===ref)) openSale(ref);
+}
+
+/* ================= 庫存異動核心 ================= */
+function logTxn(type, item, wh, delta, staff, ref, note){
+  state.txns.unshift({ ts:Date.now(), type, item, wh, delta, staff:staff||'—', ref:ref||'', note:note||'' });
+}
+function adjustPart(id, wh, delta, type, staff, ref, note){
+  const before = frontStatus(id);
+  state.inv.parts[id][wh].q += delta;
+  logTxn(type, cat(id).name, WH_LABEL[wh], delta, staff, ref, note);
+  const after = frontStatus(id);
+  if(before==='現貨' && after==='預購'){
+    notify(['stock'], '⚠️ 低庫存提醒', `「${cat(id).name}」合計庫存已低於安全庫存量，前台已自動切換為「預購」，請安排補貨或調撥。`, null);
+  }
+}
+
+/* ================= 示範資料 seed ================= */
+function seed(){
+  const now = new Date();
+  const pricing = {};
+  CATALOG.forEach(c=>{ pricing[c.id] = { biz:c.biz, cust:c.cust }; });
+
+  const parts = {};
+  CATALOG.forEach(c=>{ parts[c.id] = { north:{q:8,s:3}, central:{q:5,s:2}, south:{q:5,s:2} }; });
+  parts.p3  = { north:{q:2,s:3}, central:{q:1,s:2}, south:{q:1,s:2} };  // 機器濾網 → 預購
+  parts.p26 = { north:{q:1,s:2}, central:{q:0,s:1}, south:{q:0,s:1} };  // 寵物包 → 預購
+  parts.p13.north.q = 2; parts.p14.north.q = 2; parts.p9.north.q = 3;
+
+  const shipIn  = iso(addMonths(now,-15)); // 保固內
+  const shipOut = iso(addMonths(now,-31)); // 已過保
+
+  state = {
+    role:'customer', tab:'repairNew', invTab:'parts',
+    seq:{ r:3, s:1, n:0 },
+    pricing,
+    inv:{ parts },
+    machines: [
+      { name:'全新機器',   north:12, central:5, south:4, tNC:0, tNS:0 },
+      { name:'業務備機',   north:6,  central:3, south:3, tNC:0, tNS:0 },
+      { name:'主機Demo機', north:4,  central:2, south:2, tNC:1, tNS:0 },
+      { name:'拍打頭Demo', north:5,  central:2, south:2, tNC:0, tNS:0 },
+      { name:'租賃Demo',   north:3,  central:1, south:1, tNC:0, tNS:0 },
+    ],
+    otherGoods: [
+      { name:'手電筒', north:10, central:6, south:6 },
+      { name:'roboclean消毒水', north:24, central:12, south:12 },
+      { name:'濾心', north:15, central:8, south:8 },
+      { name:'寵物包', north:4, central:2, south:2 },
+      { name:'萊潔抗菌液', north:20, central:10, south:10 },
+      { name:'檸檬精油', north:12, central:6, south:6 },
+      { name:'水洗刮刀(白盒)', north:8, central:4, south:4 },
+      { name:'水洗刮刀(黑盒)', north:8, central:4, south:4 },
+    ],
+    acEquip: [
+      { name:'清洗罩', north:6, central:3, south:3, tNC:0, tNS:0 },
+      { name:'高壓馬達', north:4, central:2, south:2, tNC:0, tNS:0 },
+      { name:'梯子', north:5, central:3, south:3, tNC:0, tNS:0 },
+      { name:'噴壺', north:8, central:4, south:4, tNC:0, tNS:0 },
+      { name:'測溫槍', north:4, central:2, south:2, tNC:0, tNS:0 },
+      { name:'電動十字起子', north:5, central:3, south:3, tNC:0, tNS:0 },
+      { name:'手推車', north:3, central:2, south:2, tNC:0, tNS:0 },
+      { name:'15米高壓管', north:6, central:3, south:3, tNC:0, tNS:0 },
+      { name:'工具包+工具袋', north:6, central:3, south:3, tNC:0, tNS:0 },
+      { name:'剪刀', north:8, central:4, south:4, tNC:0, tNS:0 },
+      { name:'一字起子', north:8, central:4, south:4, tNC:0, tNS:0 },
+      { name:'小刷子', north:10, central:5, south:5, tNC:0, tNS:0 },
+      { name:'藥水20L', north:6, central:3, south:3, tNC:0, tNS:0 },
+      { name:'藥水5L', north:10, central:5, south:5, tNC:0, tNS:0 },
+      { name:'水桶', north:8, central:4, south:4, tNC:0, tNS:0 },
+      { name:'空調清洗劑500ml', north:20, central:10, south:10, tNC:0, tNS:0 },
+    ],
+    papers: [
+      { name:'服務訂購單', north:30, central:15, south:15 },
+      { name:'服務滿意度調查表', north:30, central:15, south:15 },
+      { name:'REF名單', north:20, central:10, south:10 },
+      { name:'機器訂購單', north:25, central:12, south:12 },
+      { name:'機器出貨單', north:25, central:12, south:12 },
+      { name:'現金分期單', north:15, central:8, south:8 },
+    ],
+    uniforms: [],
+    demoLog: [
+      { date: iso(addMonths(now,-1)), type:'借DEMO主機', person:'李佳玲', qty:1, note:'客戶展示用', staff:'張控存', ts: addMonths(now,-1).getTime() },
+      { date: todayISO(), type:'車上備機', person:'陳大偉', qty:1, note:'例行備機', staff:'張控存', ts: Date.now()-3600000 },
+    ],
+    txns: [
+      { ts: Date.now()-86400000*2, type:'入庫', item:'機器濾網', wh:'北部', delta:+10, staff:'張控存', ref:'', note:'月度進貨' },
+      { ts: Date.now()-86400000, type:'調撥', item:'遙控器', wh:'北部→中部', delta:-2, staff:'張控存', ref:'', note:'調撥至中部' },
+    ],
+    repairs: [], sales: [], notifs: [],
+  };
+
+  UNI_STYLES.forEach((st,si)=>{ WHS.forEach((r,ri)=>{
+    const sizes = {}; UNI_SIZES.forEach((sz,zi)=>{ sizes[sz] = ((si+ri+zi)%3)+1; });
+    state.uniforms.push({ region:r, style:st, sizes });
+  }); });
+
+  /* 預置維修單：三種狀態，方便各角色直接體驗 */
+  state.repairs.push({
+    id:'R-001', createdAt: Date.now()-86400000*3, byRole:'customer',
+    customer:{ name:'王小明', phone:'0912-345-678', addr:PERSONA.customer.addr },
+    orderNo:'SO-20240120-088', shipDate: shipOut,
+    items:['主機','帶電軟管(含遙控器)'], models:{ '主機':'RC-8000' },
+    issue:'主機無法啟動，按下電源鍵沒有反應，指示燈不亮。',
+    attachments:['故障影片.mp4'],
+    delivery:{ method:'courier', courierCo:'黑貓宅急便', trackingNo:'903-123-4567' },
+    owAgreed:true, status:'submitted',
+  });
+  state.repairs.push({
+    id:'R-002', createdAt: Date.now()-86400000*2, byRole:'sales',
+    customer:{ name:'李佳玲（業務）', phone:'0987-654-321', addr:PERSONA.sales.addr },
+    orderNo:'SO-20250315-102', shipDate: shipIn,
+    items:['主機','機器濾網'], models:{ '主機':'RC-9000' },
+    issue:'吸力變弱，濾網疑似破損，客戶反映運轉聲音異常。',
+    attachments:['照片1.jpg'],
+    delivery:{ method:'office', office:'central' },
+    owAgreed:false, status:'received',
+    receive:{ date: iso(addMonths(now,0)), staff:'林點收', checked:['主機','機器濾網'] },
+  });
+  const w3 = warranty(shipOut);
+  state.repairs.push({
+    id:'R-003', createdAt: Date.now()-86400000*5, byRole:'customer',
+    customer:{ name:'陳美惠', phone:'0933-222-111', addr:'新北市板橋區文化路二段 88 號' },
+    orderNo:'SO-20231108-055', shipDate: shipOut,
+    items:['遙控器','帶電軟管(含遙控器)'], models:{},
+    issue:'遙控器完全沒反應，換電池也無效。',
+    attachments:[], delivery:{ method:'north' }, owAgreed:true, status:'quoted',
+    receive:{ date: iso(addMonths(now,0)), staff:'林點收', checked:['遙控器','帶電軟管(含遙控器)'] },
+    repair:{ date: todayISO(), staff:'吳維修',
+      parts:[{ id:'p5', qty:1, human:false, unit:2700, charged:2700 }],
+      report:'檢測後確認遙控器內部電路板受潮損壞，無法修復，需更換新品遙控器。軟管本體功能正常。',
+      attachments:['檢測照片.jpg'], internalNote:'客戶機器有進水痕跡，疑似人為，已拍照存證。' },
+    quote:{ lines:[{ name:'遙控器', qty:1, unit:2700, sub:2700, waived:false }],
+      fee: INSPECT_FEE, total: 2700+INSPECT_FEE, sentAt: Date.now()-3600000*5 },
+  });
+
+  /* 預置販售單：待對帳 */
+  state.sales.push({
+    id:'S-001', createdAt: Date.now()-86400000, byRole:'customer',
+    buyer:{ name:'王小明', phone:'0912-345-678', addr:PERSONA.customer.addr },
+    items:[{ id:'p22', qty:2, unit:400, front:'現貨' }],
+    delivery:{ method:'ship', shipVia:'貨運', addr:PERSONA.customer.addr },
+    shipFee:SHIP_FEE, total: 800+SHIP_FEE, status:'pending_recon',
+    payment:{ method:'bank', date:todayISO(), ref:'55182', shot:'轉帳截圖.png', invoice:{need:false, taxId:''} },
+  });
+
+  notify(['receiver'], '📥 新維修申請單 R-001', '王小明送出維修申請（貨運寄件），請於物件到貨後進行點收。', 'R-001');
+  notify(['tech'], '🔧 R-002 已完成收件', '請進行拆機檢測並輸入維修報告。', 'R-002');
+  notify(['customer'], '📄 R-003 報價單已發送（Email/LINE）', '維修報價 $3,000，請確認是否同意維修並回覆取件方式。', 'R-003');
+  notify(['finance'], '💰 S-001 已回填付款資訊', '請進行對帳確認。', 'S-001');
+  save();
+}
+
+/* ================= 主渲染 ================= */
+function setRole(r){ state.role = r; state.tab = ROLE_TABS[r][0]; save(); render(); }
+function setTab(t){ state.tab = t; save(); render(); }
+function setInvTab(t){ state.invTab = t; save(); render(); }
+
+function render(){
+  const sel = $('roleSel');
+  sel.innerHTML = Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${state.role===k?'selected':''}>${v}</option>`).join('');
+  const tabs = ROLE_TABS[state.role];
+  if(!tabs.includes(state.tab)) state.tab = tabs[0];
+  $('tabs').innerHTML = tabs.map(t=>{
+    const extra = t==='notifs' && unreadCount()>0 ? ` (${unreadCount()})` : '';
+    return `<div class="tab ${state.tab===t?'on':''}" onclick="setTab('${t}')">${TAB_LABELS[t]}${extra}</div>`;
+  }).join('');
+  const V = {
+    repairNew:vRepairNew, shop:vShop, orders:vOrders, notifs:vNotifs,
+    receive:vReceive, handover:vHandover, overview:vOverview, work:vWork,
+    inv:vInventory, review:vReview, pricing:vPricing, txns:vTxns, recon:vRecon,
+  };
+  $('view').innerHTML = (V[state.tab]||vOverview)();
+  const c = unreadCount();
+  $('bellCnt').style.display = c>0 ? 'inline-block' : 'none';
+  $('bellCnt').textContent = c;
+}
+
+/* ============== 列表 row 工具 ============== */
+function repairRow(r){
+  const [txt, cls] = RSTATUS[r.status];
+  const w = warranty(r.shipDate);
+  return `<tr>
+    <td><b>${r.id}</b>${r.decision==='abandon'?' <span class="badge b-gray">放棄維修</span>':''}</td>
+    <td>${esc(r.customer.name)}<div class="note">${ROLES[r.byRole]}申請</div></td>
+    <td>${r.items.map(esc).join('、')}</td>
+    <td>${wBadge(w)}</td>
+    <td><span class="badge ${cls}">${txt}</span></td>
+    <td class="note">${R_ACTOR[r.status]}</td>
+    <td><button class="btn sm ghost" onclick="openRepair('${r.id}')">開啟</button></td>
+  </tr>`;
+}
+function saleRow(s){
+  const [txt, cls] = SSTATUS[s.status];
+  return `<tr>
+    <td><b>${s.id}</b></td>
+    <td>${esc(s.buyer.name)}<div class="note">${ROLES[s.byRole]}</div></td>
+    <td>${s.items.map(i=>`${cat(i.id).name}×${i.qty}${i.front==='預購'?' <span class="badge b-amber">預購</span>':''}`).join('、')}</td>
+    <td class="right">${money(s.total)}</td>
+    <td><span class="badge ${cls}">${txt}</span></td>
+    <td class="note">${S_ACTOR[s.status]}</td>
+    <td><button class="btn sm ghost" onclick="openSale('${s.id}')">開啟</button></td>
+  </tr>`;
+}
+const R_THEAD = '<tr><th>單號</th><th>申請人</th><th>維修項目</th><th>保固</th><th>狀態</th><th>待辦角色</th><th></th></tr>';
+const S_THEAD = '<tr><th>單號</th><th>購買人</th><th>品項</th><th>金額</th><th>狀態</th><th>待辦角色</th><th></th></tr>';
+
+function repairTable(list, empty){
+  if(!list.length) return `<p class="note">${empty||'目前沒有單據。'}</p>`;
+  return `<table><thead>${R_THEAD}</thead><tbody>${list.map(repairRow).join('')}</tbody></table>`;
+}
+function saleTable(list, empty){
+  if(!list.length) return `<p class="note">${empty||'目前沒有單據。'}</p>`;
+  return `<table><thead>${S_THEAD}</thead><tbody>${list.map(saleRow).join('')}</tbody></table>`;
+}
+
+/* ============== 通知 / 總覽 ============== */
+function vNotifs(){
+  const list = state.notifs.filter(n=>n.roles.includes(state.role));
+  const html = `<div class="card"><h3>🔔 通知中心（${ROLES[state.role]}）</h3>
+    <p class="note">模擬 Email／簡訊／LINE Notify 自動推播。</p>
+    ${list.length ? list.map(n=>`
+      <div class="notif ${n.read?'':'unread'}" ${n.ref?`style="cursor:pointer" onclick="openRef('${n.ref}')"`:''}>
+        <div class="t">${esc(n.title)}</div><div>${esc(n.body)}</div>
+        <div class="ts">${fmtDT(n.ts)}${n.ref?' ・點擊開啟 '+n.ref:''}</div>
+      </div>`).join('') : '<p class="note">目前沒有通知。</p>'}
+  </div>`;
+  let dirty = false;
+  list.forEach(n=>{ if(!n.read){ n.read = true; dirty = true; } });
+  if(dirty) save();
+  return html;
+}
+
+function vOverview(){
+  return `<div class="card"><h3>📋 流程總覽（所有單據）</h3>
+    <div class="flexrow" style="margin-bottom:10px"><button class="btn sm ghost" onclick="openGuide()">📖 示範流程指南</button></div>
+    <h4>維修單</h4>${repairTable(state.repairs)}
+    <h4 class="mt">配件販售單</h4>${saleTable(state.sales)}
+  </div>`;
+}
+
+function openGuide(){
+  openModal(`<h3>📖 示範流程指南</h3>
+  <p class="note">用右上角「目前角色」下拉選單切換身分，即可模擬完整流程。</p>
+  <h4>流程 A：維修單（6 階段）</h4>
+  <ol class="guide-ol">
+    <li><b>客戶／業務</b>：「維修申請」填單送出。出貨日期過保時會出現 <b>300 元檢測費同意</b> 防呆勾選。</li>
+    <li><b>收件/點收人員</b>：「收件點收」→ 系統自動判斷保固，逐項對點勾選後完成收件。</li>
+    <li><b>維修人員</b>：「維修工作台」→ 勾選更換零件（自動帶出庫存量與售價；保固內非人為損壞金額歸零）、填維修報告與內部備註。</li>
+    <li><b>系統</b>：自動生成報價單並通知客戶（見通知中心）。</li>
+    <li><b>客戶／業務</b>：「我的訂單」開啟該單 → 同意/放棄維修、回填付款資訊、選取件方式。</li>
+    <li><b>財務</b>：「對帳作業」確認核帳、填發票 → <b>點收/維修人員</b>：「取件／寄送作業」通知取件或填物流單號結案，<b>系統自動扣減庫存</b>。</li>
+  </ol>
+  <h4>流程 B：配件販售（5 步驟）</h4>
+  <ol class="guide-ol">
+    <li><b>客戶／業務</b>：「配件商城」選購（只顯示 現貨/預購，不顯示數量）→ 結帳。</li>
+    <li><b>客戶／業務</b>：開啟訂單回填付款資訊。</li>
+    <li><b>財務</b>：對帳確認。</li>
+    <li><b>控存人員</b>：「收單／預購審查」→ 判斷預購補貨/調撥 → 確認收單備貨完成（自動扣庫存＋通知）。</li>
+    <li><b>系統</b>：自動發送取件/寄件通知 → 結案。</li>
+  </ol>
+  <h4>流程 C：庫存管理（控存人員）</h4>
+  <ol class="guide-ol">
+    <li>「庫存管理」：零件配件／機器／制服／冷氣設備／紙本表單／Demo借用登記，支援入庫、出庫、調撥（含運送中）、安全庫存設定。</li>
+    <li>低於安全庫存 → 自動通知控存＋前台切為「預購」。</li>
+    <li>「價目表維護」：可補上 <b>待補</b> 項目價格。「異動記錄」：完整流水帳（操作人＋時間戳）。</li>
+  </ol>`);
+}
+
+/* ============== 階段1：維修申請 ============== */
+function vRepairNew(){
+  const p = PERSONA[state.role] || PERSONA.customer;
+  return `<div class="card">
+    <h3>🛠️ 線上維修申請單（階段 1）</h3>
+    <div class="infobox">目前以 <b>${ROLES[state.role]}</b> 身分申請。送出後請切換角色體驗後續流程（右上角可開「流程總覽」→ 指南）。</div>
+    <h4>購買者資料</h4>
+    <div class="grid2">
+      <div class="field"><span>姓名 *</span><input id="rq_name" value="${esc(p.name)}" style="width:100%"></div>
+      <div class="field"><span>電話 *</span><input id="rq_phone" value="${esc(p.phone)}" style="width:100%"></div>
+      <div class="field"><span>地址</span><input id="rq_addr" value="${esc(p.addr)}" style="width:100%"></div>
+    </div>
+    <h4>購買資訊</h4>
+    <div class="grid2">
+      <div class="field"><span>訂單編號</span><input id="rq_orderNo" placeholder="SO-XXXXXXXX" style="width:100%"></div>
+      <div class="field"><span>出貨日期 *（系統據此判斷保固，Demo 保固 ${WARRANTY_YEARS} 年）</span>
+        <input type="date" id="rq_ship" style="width:100%" onchange="checkOW()"></div>
+    </div>
+    <div id="owBox"></div>
+    <h4>維修項目（可複選）</h4>
+    <div>${REPAIR_ITEMS.map((it,i)=>`
+      <label class="opt"><input type="checkbox" id="rq_it${i}"> ${it}</label>${(it==='主機'||it==='拍打頭')?`<input id="rq_md${i}" placeholder="${it}型號" style="width:110px;padding:4px 8px;font-size:12px;margin-right:8px">`:''}
+    `).join('')}</div>
+    <h4>故障原因</h4>
+    <textarea id="rq_issue" placeholder="請描述故障情形…"></textarea>
+    <h4>照片或影片附件</h4>
+    <input type="file" id="rq_file" multiple> <span class="note">（Demo 僅記錄檔名，不實際上傳）</span>
+    <h4>送件方式</h4>
+    <div>
+      <label class="opt"><input type="radio" name="rq_dm" value="north" onchange="dmUI()"> 自送至北部維修部門</label>
+      <label class="opt"><input type="radio" name="rq_dm" value="office" onchange="dmUI()"> 自送至就近辦事處</label>
+      <label class="opt"><input type="radio" name="rq_dm" value="courier" onchange="dmUI()"> 貨運寄件</label>
+    </div>
+    <div id="dmBox" class="mt"></div>
+    <div class="mt"><button class="btn" onclick="submitRepair()">送出維修申請</button></div>
+  </div>`;
+}
+function checkOW(){
+  const w = warranty($('rq_ship').value);
+  $('owBox').innerHTML = (w && !w.inW) ? `<div class="warnbox"><b>⚠️ 系統提示（防呆）</b><br>
+    本機已過保固（${wBadge(w)}）。<i>如本機已過保固將收取基本送檢費及檢測費共 ${INSPECT_FEE} 元，是否同意？</i><br>
+    <label class="opt mt"><input type="checkbox" id="rq_ow"> <b>我同意</b>支付 ${INSPECT_FEE} 元送檢費及檢測費</label></div>` : (w ? `<div class="okbox">${wBadge(w)}　保固內免收檢測費。</div>` : '');
+}
+function dmUI(){
+  const v = document.querySelector('input[name=rq_dm]:checked')?.value;
+  let h = '';
+  if(v==='north') h = `<div class="infobox">📍 ${OFFICES.north.name}：${OFFICES.north.addr}（系統自動帶出）</div>`;
+  if(v==='office') h = `<div class="infobox">請選擇辦事處：
+    <label class="opt"><input type="radio" name="rq_off" value="central" checked> ${OFFICES.central.name}（${OFFICES.central.addr}）</label>
+    <label class="opt"><input type="radio" name="rq_off" value="south"> ${OFFICES.south.name}（${OFFICES.south.addr}）</label></div>`;
+  if(v==='courier') h = `<div class="infobox flexrow">物流公司：<input id="rq_cco" placeholder="如：黑貓宅急便" style="width:160px">　物流單號：<input id="rq_ctn" placeholder="單號" style="width:160px"></div>`;
+  $('dmBox').innerHTML = h;
+}
+function submitRepair(){
+  const name = $('rq_name').value.trim(), phone = $('rq_phone').value.trim(), ship = $('rq_ship').value;
+  if(!name || !phone) return toast('請填寫姓名與電話');
+  if(!ship) return toast('請填寫出貨日期（判斷保固用）');
+  const items = [], models = {};
+  REPAIR_ITEMS.forEach((it,i)=>{
+    if($('rq_it'+i).checked){ items.push(it); const m = $('rq_md'+i); if(m && m.value.trim()) models[it] = m.value.trim(); }
+  });
+  if(!items.length) return toast('請至少勾選一項維修項目');
+  const dm = document.querySelector('input[name=rq_dm]:checked')?.value;
+  if(!dm) return toast('請選擇送件方式');
+  const delivery = { method:dm };
+  if(dm==='office') delivery.office = document.querySelector('input[name=rq_off]:checked')?.value || 'central';
+  if(dm==='courier'){
+    delivery.courierCo = $('rq_cco').value.trim(); delivery.trackingNo = $('rq_ctn').value.trim();
+    if(!delivery.courierCo || !delivery.trackingNo) return toast('貨運寄件請填寫物流公司與單號');
+  }
+  const w = warranty(ship);
+  let owAgreed = false;
+  if(!w.inW){
+    if(!$('rq_ow') || !$('rq_ow').checked) return toast('⚠️ 已過保固：須勾選「同意支付 300 元檢測費」方可送出');
+    owAgreed = true;
+  }
+  const files = [...($('rq_file').files||[])].map(f=>f.name);
+  const id = 'R-' + String(++state.seq.r).padStart(3,'0');
+  state.repairs.unshift({
+    id, createdAt:Date.now(), byRole:state.role,
+    customer:{ name, phone, addr:$('rq_addr').value.trim() },
+    orderNo:$('rq_orderNo').value.trim(), shipDate:ship,
+    items, models, issue:$('rq_issue').value.trim(), attachments:files,
+    delivery, owAgreed, status:'submitted',
+  });
+  notify(['receiver'], `📥 新維修申請單 ${id}`, `${name} 送出維修申請，請於物件到貨後點收。`, id);
+  save(); toast('✅ 維修申請已送出：' + id);
+  state.tab = 'orders'; render(); openRepair(id);
+}
+
+/* ============== 配件商城 ============== */
+function vShop(){
+  const kind = kindOf(state.role);
+  const goods = CATALOG.filter(c=>c.sale && !(state.role!=='sales' && c.bizOnly) && price(c.id, kind)!=null);
+  const cards = goods.map(c=>{
+    const inCart = cart.find(x=>x.id===c.id);
+    return `<div class="item-card">
+      <div class="nm">${c.name} ${fsBadge(c.id)}</div>
+      <div class="pr">${money(price(c.id, kind))}</div>
+      ${c.note?`<div class="note">${c.note}</div>`:''}
+      <div class="flexrow"><input type="number" id="qty_${c.id}" value="${inCart?inCart.qty:1}" min="1" max="99" style="width:64px;padding:5px 8px">
+      <button class="btn sm" onclick="addToCart('${c.id}')">加入</button></div>
+    </div>`;
+  }).join('');
+  const kindNote = kind==='biz' ? '（業務價）' : '（客戶價）';
+  const total = cartTotal();
+  const p = PERSONA[state.role] || PERSONA.customer;
+  return `<div class="card"><h3>🛒 配件商城 ${kindNote}</h3>
+    <p class="note">前台僅顯示「現貨／預購」狀態，<b>不顯示實際庫存數量</b>（依安全庫存量自動切換）。預購商品仍可下單，由控存人員審查補貨。</p>
+    <div class="shop-grid">${cards}</div></div>
+  <div class="card"><h3>🧺 購物車與結帳</h3>
+    ${cart.length ? `<table><thead><tr><th>品項</th><th>單價</th><th>數量</th><th>小計</th><th></th></tr></thead><tbody>
+      ${cart.map(x=>`<tr><td>${cat(x.id).name} ${fsBadge(x.id)}</td><td>${money(price(x.id,kind))}</td><td>${x.qty}</td>
+        <td>${money(price(x.id,kind)*x.qty)}</td><td><button class="btn sm warn" onclick="rmCart('${x.id}')">移除</button></td></tr>`).join('')}
+    </tbody></table>
+    <h4>購買人資料</h4>
+    <div class="grid2">
+      <div class="field"><span>姓名 *</span><input id="ck_name" value="${esc(p.name)}" style="width:100%"></div>
+      <div class="field"><span>電話 *</span><input id="ck_phone" value="${esc(p.phone)}" style="width:100%"></div>
+      <div class="field"><span>地址</span><input id="ck_addr" value="${esc(p.addr)}" style="width:100%"></div>
+    </div>
+    <h4>取件方式</h4>
+    <label class="opt"><input type="radio" name="ck_dm" value="pickup" onchange="ckUI()"> 辦事處自取（免運費）</label>
+    <label class="opt"><input type="radio" name="ck_dm" value="ship" onchange="ckUI()"> 貨運／郵局寄件（加收運費 ${money(SHIP_FEE)}）</label>
+    <div id="ckBox" class="mt"></div>
+    <div class="mt"><b>商品合計 ${money(total)}</b><span id="ckTotal"></span></div>
+    <div class="mt"><button class="btn green" onclick="checkout()">送出訂單</button></div>`
+    : '<p class="note">購物車是空的，請從上方加入商品。</p>'}
+  </div>`;
+}
+function addToCart(id){
+  const q = Math.max(1, parseInt($('qty_'+id).value)||1);
+  const ex = cart.find(x=>x.id===id);
+  if(ex) ex.qty = q; else cart.push({ id, qty:q });
+  toast('已加入購物車'); render();
+}
+function rmCart(id){ cart = cart.filter(x=>x.id!==id); render(); }
+function cartTotal(){ const k = kindOf(state.role); return cart.reduce((t,x)=>t+price(x.id,k)*x.qty, 0); }
+function ckUI(){
+  const v = document.querySelector('input[name=ck_dm]:checked')?.value;
+  let h = '';
+  if(v==='pickup') h = `<div class="infobox">自取地點：
+    <label class="opt"><input type="radio" name="ck_off" value="north" checked> ${OFFICES.north.name}（${OFFICES.north.addr}）</label>
+    <label class="opt"><input type="radio" name="ck_off" value="central"> ${OFFICES.central.name}（${OFFICES.central.addr}）</label>
+    <label class="opt"><input type="radio" name="ck_off" value="south"> ${OFFICES.south.name}（${OFFICES.south.addr}）</label></div>`;
+  if(v==='ship') h = `<div class="infobox flexrow">寄送方式：<select id="ck_via"><option>貨運</option><option>郵局</option></select>
+    收件地址：<input id="ck_shipaddr" value="${esc($('ck_addr').value)}" style="width:280px"></div>`;
+  $('ckBox').innerHTML = h;
+  $('ckTotal').textContent = v==='ship' ? `　＋運費 ${money(SHIP_FEE)} ＝ 總計 ${money(cartTotal()+SHIP_FEE)}` : `　＝ 總計 ${money(cartTotal())}`;
+}
+function checkout(){
+  if(!cart.length) return;
+  const name = $('ck_name').value.trim(), phone = $('ck_phone').value.trim();
+  if(!name || !phone) return toast('請填寫購買人姓名與電話');
+  const dm = document.querySelector('input[name=ck_dm]:checked')?.value;
+  if(!dm) return toast('請選擇取件方式');
+  const k = kindOf(state.role);
+  const delivery = { method:dm };
+  let shipFee = 0;
+  if(dm==='pickup') delivery.office = document.querySelector('input[name=ck_off]:checked')?.value || 'north';
+  else {
+    delivery.shipVia = $('ck_via').value; delivery.addr = $('ck_shipaddr').value.trim();
+    if(!delivery.addr) return toast('請填寫收件地址');
+    shipFee = SHIP_FEE;
+  }
+  const items = cart.map(x=>({ id:x.id, qty:x.qty, unit:price(x.id,k), front:frontStatus(x.id) }));
+  const id = 'S-' + String(++state.seq.s).padStart(3,'0');
+  state.sales.unshift({
+    id, createdAt:Date.now(), byRole:state.role,
+    buyer:{ name, phone, addr:$('ck_addr').value.trim() },
+    items, delivery, shipFee,
+    total: items.reduce((t,i)=>t+i.unit*i.qty,0)+shipFee,
+    status:'pending_payment',
+  });
+  cart = []; save(); toast('✅ 訂單已成立：'+id+'，請完成付款');
+  state.tab = 'orders'; render(); openSale(id);
+}
+
+/* ============== 我的訂單 ============== */
+function vOrders(){
+  return `<div class="card"><h3>📁 我的訂單</h3>
+    <p class="note">Demo 模式：顯示全部單據以便展示（實際系統依登入者過濾）。</p>
+    <h4>維修單</h4>${repairTable(state.repairs)}
+    <h4 class="mt">配件購買訂單</h4>${saleTable(state.sales)}
+  </div>`;
+}
+
+/* ============== 角色工作清單 ============== */
+function vReceive(){
+  const list = state.repairs.filter(r=>r.status==='submitted');
+  return `<div class="card"><h3>📥 收件點收（維修單 階段 2）</h3>
+    <p class="note">物件到貨後開啟單據 → 系統自動顯示保固判定 → 逐項對點勾選 → 完成收件。</p>
+    ${repairTable(list, '目前沒有待收件的維修單。可切換「客戶」角色先送出申請。')}
+    <h4 class="mt">全部維修單</h4>${repairTable(state.repairs.filter(r=>r.status!=='submitted'))}
+  </div>`;
+}
+function vWork(){
+  const list = state.repairs.filter(r=>r.status==='received');
+  return `<div class="card"><h3>🔧 維修工作台（維修單 階段 3）</h3>
+    <p class="note">開啟單據 → 勾選更換零件（自動帶庫存與售價，保固內非人為損壞歸零）→ 填維修報告 → 送出即自動發送報價單（階段 4）。</p>
+    ${repairTable(list, '目前沒有檢測中的維修單。可切換「收件/點收人員」先完成收件。')}
+    <h4 class="mt">全部維修單</h4>${repairTable(state.repairs.filter(r=>r.status!=='received'))}
+  </div>`;
+}
+function vHandover(){
+  const list = state.repairs.filter(r=>r.status==='reconciled');
+  return `<div class="card"><h3>📦 取件／寄送作業（維修單 階段 6）</h3>
+    <p class="note">財務核帳完成後：自取 → 輸入可取件時間並通知；貨運 → 填物流單號寄出，系統自動結案並<b>正式扣減庫存</b>。</p>
+    ${repairTable(list, '目前沒有待取件／寄送的維修單。')}
+    <h4 class="mt">已結案</h4>${repairTable(state.repairs.filter(r=>r.status==='closed'), '尚無結案單據。')}
+  </div>`;
+}
+function vRecon(){
+  const rl = state.repairs.filter(r=>r.status==='paid');
+  const sl = state.sales.filter(s=>s.status==='pending_recon');
+  return `<div class="card"><h3>💰 對帳作業（財務）</h3>
+    <p class="note">核對客戶回填的付款資訊 → 勾選確認核帳 → 填發票資訊 → 完成後自動通知後續角色。</p>
+    <h4>維修單待對帳</h4>${repairTable(rl, '沒有待對帳的維修單。')}
+    <h4 class="mt">販售單待對帳</h4>${saleTable(sl, '沒有待對帳的販售單。')}
+    <h4 class="mt">近期已完成</h4>
+    ${repairTable(state.repairs.filter(r=>['reconciled','closed'].includes(r.status)), '—')}
+    ${saleTable(state.sales.filter(s=>['pending_stock','ready','closed'].includes(s.status)), '—')}
+  </div>`;
+}
+function vReview(){
+  const pend = state.sales.filter(s=>s.status==='pending_stock');
+  const ready = state.sales.filter(s=>s.status==='ready');
+  return `<div class="card"><h3>📦 收單／預購審查（控存）</h3>
+    <p class="note">對帳完成的販售訂單在此收單。含「預購」商品時，請判斷補貨或跨區調撥後再確認備貨。</p>
+    <h4>待收單備貨</h4>${saleTable(pend, '沒有待收單的訂單。')}
+    <h4 class="mt">備貨完成（待結案）</h4>${saleTable(ready, '—')}
+    <h4 class="mt">全部販售單</h4>${saleTable(state.sales.filter(s=>!['pending_stock','ready'].includes(s.status)), '—')}
+  </div>`;
+}
+
+/* ============== Modal 機制 ============== */
+let current = null;
+function openModal(html){ $('modalBody').innerHTML = html; $('overlay').style.display = 'flex'; }
+function closeModal(){ $('overlay').style.display = 'none'; current = null; }
+function openRepair(id){ current = { kind:'r', id }; openModal(repairDetailHTML(state.repairs.find(r=>r.id===id))); }
+function openSale(id){ current = { kind:'s', id }; openModal(saleDetailHTML(state.sales.find(s=>s.id===id))); }
+function refreshModal(){
+  if(!current) return;
+  if(current.kind==='r') openRepair(current.id); else openSale(current.id);
+}
+function stepperHTML(steps, done){
+  return `<div class="steps">${steps.map((s,i)=>{
+    const n = i+1;
+    const cls = n<=done ? 'done' : (n===done+1 ? 'now' : '');
+    return `<div class="step ${cls}" data-n="${n}">${s}</div>`;
+  }).join('')}</div>`;
+}
+const QR_SVG = `<svg class="qr" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><rect width="21" height="21" fill="#fff"/><path fill="#000" d="M0 0h7v7H0zM2 2h3v3H2zM14 0h7v7h-7zM16 2h3v3h-3zM0 14h7v7H0zM2 16h3v3H2zM9 0h1v2H9zM11 1h2v1h-2zM9 3h3v1H9zM12 4h1v3h-1zM9 5h1v2H9zM10 6h1v1h-1zM0 9h2v1H0zM3 9h2v2H3zM6 9h1v1H6zM8 8h1v3H8zM10 9h2v1h-2zM13 9h1v2h-1zM15 9h2v1h-2zM18 9h1v1h-1zM20 9h1v2h-1zM1 11h1v2H1zM4 12h3v1H4zM9 11h1v3H9zM11 12h2v1h-2zM14 12h1v2h-1zM16 11h2v2h-2zM19 12h2v1h-2zM9 15h2v1H9zM12 14h1v3h-1zM14 15h3v1h-3zM18 14h1v2h-1zM20 15h1v2h-1zM9 17h1v2H9zM11 18h2v1h-2zM14 17h1v2h-1zM16 18h3v1h-3zM10 20h2v1h-2zM13 20h1v1h-1zM15 20h2v1h-2zM19 20h2v1h-2z"/></svg>`;
+
+/* ============== 維修單詳情 ============== */
+const INTERNAL_ROLES = ['receiver','tech','stock','finance'];
+
+function deliveryText(d){
+  if(!d) return '—';
+  if(d.method==='north') return `自送｜${OFFICES.north.name}（${OFFICES.north.addr}）`;
+  if(d.method==='office') return `自送｜${OFFICES[d.office].name}（${OFFICES[d.office].addr}）`;
+  return `貨運寄件｜${esc(d.courierCo||'')} ${esc(d.trackingNo||'')}`;
+}
+function pickupText(p){
+  if(!p) return '—';
+  if(p.method==='north') return `北部維修部門自取（${OFFICES.north.addr}）`;
+  if(p.method==='office') return `${OFFICES[p.office].name}自取（${OFFICES[p.office].addr}）`;
+  return `貨運寄件（收件地址：${esc(p.addr||'')}）`;
+}
+function payText(p){
+  if(!p) return '—';
+  return `${p.method==='linepay'?'LinePay':'匯款'}｜付款日 ${fmtDate(p.date)}｜${p.method==='linepay'?'LinePay編號':'轉帳後五碼'}：${esc(p.ref)}${p.shot?`｜截圖：${esc(p.shot)}`:''}${p.invoice&&p.invoice.need?`｜統編：${esc(p.invoice.taxId)}`:'｜不開統編'}`;
+}
+
+function repairDetailHTML(r){
+  const w = warranty(r.shipDate);
+  const [stTxt, stCls] = RSTATUS[r.status];
+  const isOrderer = ['customer','sales'].includes(state.role);
+  const internal = INTERNAL_ROLES.includes(state.role);
+  let h = `<h3>維修單 ${r.id} <span class="badge ${stCls}">${stTxt}</span>${r.decision==='abandon'?' <span class="badge b-gray">放棄維修</span>':''}</h3>
+  ${stepperHTML(RSTEPS, RDONE[r.status])}
+  <div class="sec"><h4>📋 申請資料（階段 1）</h4><div class="kv">
+    <b>申請身分</b>${ROLES[r.byRole]}　<b>申請時間</b>${fmtDT(r.createdAt)}<br>
+    <b>購買者</b>${esc(r.customer.name)}／${esc(r.customer.phone)}／${esc(r.customer.addr||'—')}<br>
+    <b>訂單編號</b>${esc(r.orderNo||'—')}　<b>出貨日期</b>${fmtDate(r.shipDate)}　${wBadge(w)}<br>
+    <b>維修項目</b>${r.items.map(it=>esc(it)+(r.models[it]?`（型號 ${esc(r.models[it])}）`:'')).join('、')}<br>
+    <b>故障原因</b>${esc(r.issue||'—')}<br>
+    <b>附件</b>${r.attachments.length?r.attachments.map(esc).join('、'):'—'}<br>
+    <b>送件方式</b>${deliveryText(r.delivery)}
+    ${!w||w.inW?'':`<br><b>過保檢測費</b><span class="badge ${r.owAgreed?'b-green':'b-red'}">${r.owAgreed?'已同意 300 元':'未同意'}</span>`}
+  </div></div>`;
+
+  /* 階段 2 */
+  if(r.receive){
+    h += `<div class="sec"><h4>📥 收件記錄（階段 2）</h4><div class="kv">
+      <b>收件日期</b>${fmtDate(r.receive.date)}　<b>點收人員</b>${esc(r.receive.staff)}<br>
+      <b>點收項目</b>${r.receive.checked.map(esc).join('、')} ✓ 全數到齊</div></div>`;
+  } else if(r.status==='submitted'){
+    h += `<div class="sec"><h4>📥 收件點收（階段 2）</h4>`;
+    if(state.role==='receiver'){
+      h += `<div class="infobox">系統已自動判定保固：${wBadge(w)}</div>
+      <div class="grid2">
+        <div class="field"><span>收件日期 *</span><input type="date" id="rc_date" value="${todayISO()}" style="width:100%"></div>
+        <div class="field"><span>點收人員姓名 *</span><input id="rc_staff" placeholder="請輸入姓名" style="width:100%"></div>
+      </div>
+      <div class="field"><span>收件項目逐項對點（須全數勾選）</span>
+        ${r.items.map((it,i)=>`<label class="opt"><input type="checkbox" id="rc_it${i}"> ${esc(it)}</label>`).join('')}
+      </div>
+      <button class="btn" onclick="doReceive('${r.id}')">完成點收，進入維修</button>`;
+    } else h += `<p class="note">等待「收件/點收人員」到貨點收。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+
+  /* 階段 3 */
+  if(r.repair){
+    h += `<div class="sec"><h4>🔧 維修報告（階段 3）</h4><div class="kv">
+      <b>維修日期</b>${fmtDate(r.repair.date)}　<b>維修人員</b>${esc(r.repair.staff)}<br>
+      <b>更換項目</b>${r.repair.parts.length?r.repair.parts.map(p=>`${cat(p.id).name}×${p.qty}${p.charged===0?'（保固內免費）':''}`).join('、'):'無'}<br>
+      <b>維修報告</b>${esc(r.repair.report)}<br>
+      <b>附件</b>${r.repair.attachments.length?r.repair.attachments.map(esc).join('、'):'—'}
+      ${internal?`<br><b style="color:#c0392b">內部備註 🔒</b>${esc(r.repair.internalNote||'—')} <span class="note">（客戶/業務不可見）</span>`:''}
+    </div></div>`;
+  } else if(r.status==='received'){
+    h += `<div class="sec"><h4>🔧 拆機檢測與維修報告（階段 3）</h4>`;
+    if(state.role==='tech'){
+      const kind = kindOf(r.byRole);
+      h += `<div class="infobox">${wBadge(w)}　${w.inW?'保固內：非人為損壞之更換零件<b>金額自動歸零</b>。':'已過保：更換零件依價目表計價，另加檢測費 '+money(INSPECT_FEE)+'。'}</div>
+      <div class="grid2">
+        <div class="field"><span>維修日期 *</span><input type="date" id="wk_date" value="${todayISO()}" style="width:100%"></div>
+        <div class="field"><span>維修人員 *</span><input id="wk_staff" placeholder="請輸入姓名" style="width:100%"></div>
+      </div>
+      <div class="field"><span>更換項目（勾選自動帶出庫存量與${kind==='biz'?'業務':'客戶'}維修金額）</span>
+      <table><thead><tr><th></th><th>零件</th><th>北部庫存</th><th>單價</th><th>數量</th>${w.inW?'<th>人為損壞</th>':''}<th class="right">計價</th></tr></thead><tbody>
+      ${CATALOG.filter(c=>c.repair).map(c=>{
+        const u = price(c.id, kind);
+        const stk = state.inv.parts[c.id].north.q;
+        return `<tr>
+          <td><input type="checkbox" id="wp_${c.id}" ${u==null?'disabled':''} onchange="workPrev('${r.id}')"></td>
+          <td>${c.name}${c.note?`<div class="note">${c.note}</div>`:''}</td>
+          <td class="${stk<=state.inv.parts[c.id].north.s?'low':''}">${stk}</td>
+          <td>${u==null?'<span class="badge b-red">待補價格</span> <span class="note">請至價目表維護</span>':money(u)}</td>
+          <td><input type="number" id="wq_${c.id}" value="1" min="1" max="9" style="width:56px;padding:4px 6px" onchange="workPrev('${r.id}')"></td>
+          ${w.inW?`<td><input type="checkbox" id="wh_${c.id}" onchange="workPrev('${r.id}')"></td>`:''}
+          <td class="right" id="wc_${c.id}">—</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table></div>
+      <div class="right" style="font-size:15px"><b id="wtotal">報價合計 ${money(w.inW?0:INSPECT_FEE)}</b></div>
+      <div class="field"><span>維修報告 *（客戶/業務可見）</span><textarea id="wk_report" placeholder="檢測結果與維修說明…"></textarea></div>
+      <div class="field"><span>照片或影片附件</span><input type="file" id="wk_file" multiple></div>
+      <div class="field"><span>其它內部記錄備註 🔒（僅內部可視）</span><textarea id="wk_note" placeholder="內部備註，客戶/業務不可見…"></textarea></div>
+      <button class="btn" onclick="submitWork('${r.id}')">提交維修報告，發送報價單（階段 4）</button>`;
+    } else h += `<p class="note">等待「維修人員」拆機檢測。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+
+  /* 階段 4+5：報價單與客戶回覆 */
+  if(r.quote){
+    h += `<div class="sec"><h4>📄 電子報價單（階段 4・系統自動生成並已透過 Email/LINE 通知）</h4>
+    <table><thead><tr><th>項目</th><th>數量</th><th>單價</th><th class="right">小計</th></tr></thead><tbody>
+    ${r.quote.lines.map(l=>`<tr><td>${esc(l.name)}${l.waived?' <span class="badge b-green">保固內免費</span>':''}</td><td>${l.qty}</td><td>${money(l.unit)}</td><td class="right">${l.waived?money(0):money(l.sub)}</td></tr>`).join('')}
+    ${r.quote.fee?`<tr><td>基本送檢費及檢測費（過保）</td><td>1</td><td>${money(r.quote.fee)}</td><td class="right">${money(r.quote.fee)}</td></tr>`:''}
+    <tr><td colspan="3"><b>合計</b></td><td class="right"><b>${money(r.quote.total)}</b></td></tr>
+    </tbody></table>
+    <p class="note">發送時間：${fmtDT(r.quote.sentAt)}</p></div>`;
+  }
+
+  if(r.status==='quoted'){
+    h += `<div class="sec"><h4>✅ 維修意願確認與付款（階段 5）</h4>`;
+    if(isOrderer){
+      const fee = (w && !w.inW) ? INSPECT_FEE : 0;
+      h += `<div>
+        <label class="opt"><input type="radio" name="dc_d" value="agree" onchange="decUI('${r.id}')"> <b>【同意維修】</b>（應付 ${money(r.quote.total)}）</label>
+        <label class="opt"><input type="radio" name="dc_d" value="abandon" onchange="decUI('${r.id}')"> <b>【放棄維修】</b>${fee?`（過保仍需支付檢測費 ${money(fee)}）`:'（保固內，無需費用）'}</label>
+      </div>
+      <div id="dcPay"></div>
+      <h4>取件方式</h4>
+      <label class="opt"><input type="radio" name="dc_pk" value="north" onchange="decPkUI()"> 北部維修部門自取</label>
+      <label class="opt"><input type="radio" name="dc_pk" value="office" onchange="decPkUI()"> 就近辦事處自取</label>
+      <label class="opt"><input type="radio" name="dc_pk" value="courier" onchange="decPkUI()"> 貨運寄件</label>
+      <div id="dcPkBox"></div>
+      <div class="mt"><button class="btn green" onclick="submitDecision('${r.id}')">送出回覆</button></div>`;
+    } else h += `<p class="note">等待「客戶／業務」回覆維修意願與付款。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+
+  if(r.decision){
+    h += `<div class="sec"><h4>💳 客戶回覆（階段 5）</h4><div class="kv">
+      <b>維修意願</b>${r.decision==='agree'?'同意維修':'放棄維修'}　<b>應付金額</b>${money(r.payAmount||0)}<br>
+      <b>付款資訊</b>${payText(r.payment)}<br>
+      <b>取件方式</b>${pickupText(r.pickup)}</div></div>`;
+  }
+
+  /* 階段 6：對帳 */
+  if(r.status==='paid'){
+    h += `<div class="sec"><h4>💰 財務對帳（階段 6）</h4>`;
+    if(state.role==='finance'){
+      h += `<div class="grid2">
+        <div class="field"><span>核帳人員姓名 *</span><input id="fn_staff" placeholder="請輸入姓名" style="width:100%"></div>
+        <div class="field"><span>發票開立日期</span><input type="date" id="fn_ivd" value="${todayISO()}" style="width:100%"></div>
+        <div class="field"><span>發票號碼</span><input id="fn_ivn" placeholder="AB-12345678" style="width:100%"></div>
+      </div>
+      <label class="opt"><input type="checkbox" id="fn_ok"> <b>確認核帳</b>（金流已核對無誤）</label>
+      <div class="mt"><button class="btn" onclick="doReconRepair('${r.id}')">完成對帳</button></div>
+      <p class="note">發票隨物品一起交件。</p>`;
+    } else h += `<p class="note">等待「核帳/財務人員」對帳確認。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+  if(r.account){
+    h += `<div class="sec"><h4>🧾 核帳記錄</h4><div class="kv">
+      <b>核帳人員</b>${esc(r.account.staff)}　<b>核帳時間</b>${fmtDT(r.account.ts)}<br>
+      <b>發票</b>${r.account.ivn?`${fmtDate(r.account.ivd)}／${esc(r.account.ivn)}（隨物品交件）`:'未開立'}</div></div>`;
+  }
+
+  /* 階段 6：取件/寄送 */
+  if(r.status==='reconciled'){
+    h += `<div class="sec"><h4>📦 通知取件／寄出結案（階段 6）</h4>`;
+    if(state.role==='receiver' || state.role==='tech'){
+      if(r.pickup && r.pickup.method==='courier'){
+        h += `<div class="grid2">
+          <div class="field"><span>物流公司 *</span><input id="cl_cco" placeholder="如：黑貓宅急便" style="width:100%"></div>
+          <div class="field"><span>物流單號 *</span><input id="cl_ctn" placeholder="單號" style="width:100%"></div>
+        </div>
+        <button class="btn green" onclick="closeRepair('${r.id}','courier')">寄出並自動結案（扣減庫存）</button>`;
+      } else {
+        h += `${r.notice?`<div class="okbox">已通知客戶可取件：${esc(r.notice.time)}／點交人員 ${esc(r.notice.staff)}</div>`:''}
+        <div class="grid2">
+          <div class="field"><span>可取件時間 *</span><input type="datetime-local" id="cl_time" style="width:100%" value="${r.notice?r.notice.raw:''}"></div>
+          <div class="field"><span>點交人員姓名 *</span><input id="cl_staff" style="width:100%" value="${r.notice?esc(r.notice.staff):''}"></div>
+        </div>
+        <div class="flexrow">
+          ${r.notice?'':`<button class="btn" onclick="sendPickupNotice('${r.id}')">通知客戶取件時間</button>`}
+          <button class="btn green" onclick="closeRepair('${r.id}','pickup')">完成點交，結案（扣減庫存）</button>
+        </div>`;
+      }
+    } else h += `<p class="note">等待「點收／維修人員」安排取件或寄出。取件方式：${pickupText(r.pickup)}</p>`;
+    h += `</div>`;
+  }
+  if(r.status==='closed'){
+    h += `<div class="sec"><div class="okbox"><b>✅ 已結案</b>　${fmtDT(r.closedAt)}<br>
+      ${r.shipOut?`貨運寄出：${esc(r.shipOut.co)}／${esc(r.shipOut.no)}`:`點交完成：${esc(r.notice?r.notice.staff:'—')}${r.notice?'／'+esc(r.notice.time):''}`}
+      ${r.decision==='agree'&&r.repair&&r.repair.parts.length?`<br>庫存已自動扣減：${r.repair.parts.map(p=>cat(p.id).name+'×'+p.qty).join('、')}（北部倉，流水帳含維修單號 ${r.id}）`:''}
+    </div></div>`;
+  }
+  return h;
+}
+
+/* ============== 階段動作 ============== */
+function doReceive(id){
+  const r = state.repairs.find(x=>x.id===id);
+  const date = $('rc_date').value, staff = $('rc_staff').value.trim();
+  if(!date || !staff) return toast('請填寫收件日期與點收人員姓名');
+  const missing = r.items.filter((_,i)=>!$('rc_it'+i).checked);
+  if(missing.length) return toast('⚠️ 防呆：尚未逐項對點完成（'+missing.join('、')+'）');
+  r.receive = { date, staff, checked:[...r.items] };
+  r.status = 'received';
+  notify(['tech'], `🔧 ${id} 已完成收件`, `點收人員 ${staff} 已完成對點，請進行拆機檢測。`, id);
+  notify([r.byRole], `📦 ${id} 已收到您的物件`, `我們已於 ${fmtDate(date)} 完成收件點收，進入檢測程序。`, id);
+  save(); toast('✅ 收件完成'); render(); refreshModal();
+}
+
+function workPrev(rid){
+  const r = state.repairs.find(x=>x.id===rid);
+  const w = warranty(r.shipDate), kind = kindOf(r.byRole);
+  let total = w.inW ? 0 : INSPECT_FEE;
+  CATALOG.filter(c=>c.repair).forEach(c=>{
+    const cell = $('wc_'+c.id); if(!cell) return;
+    const chk = $('wp_'+c.id);
+    if(chk && chk.checked){
+      const qty = Math.max(1, parseInt($('wq_'+c.id).value)||1);
+      const human = w.inW ? ($('wh_'+c.id)?.checked||false) : true;
+      const u = price(c.id, kind)||0;
+      const charged = (w.inW && !human) ? 0 : u*qty;
+      cell.innerHTML = charged===0 ? '<span class="badge b-green">$0 保固</span>' : money(charged);
+      total += charged;
+    } else cell.textContent = '—';
+  });
+  $('wtotal').textContent = '報價合計 ' + money(total);
+}
+
+function submitWork(rid){
+  const r = state.repairs.find(x=>x.id===rid);
+  const date = $('wk_date').value, staff = $('wk_staff').value.trim(), report = $('wk_report').value.trim();
+  if(!date || !staff) return toast('請填寫維修日期與維修人員');
+  if(!report) return toast('請填寫維修報告（將附在報價單上）');
+  const w = warranty(r.shipDate), kind = kindOf(r.byRole);
+  const parts = [], lines = [];
+  CATALOG.filter(c=>c.repair).forEach(c=>{
+    const chk = $('wp_'+c.id);
+    if(chk && chk.checked){
+      const qty = Math.max(1, parseInt($('wq_'+c.id).value)||1);
+      const human = w.inW ? ($('wh_'+c.id)?.checked||false) : true;
+      const u = price(c.id, kind)||0;
+      const waived = w.inW && !human;
+      parts.push({ id:c.id, qty, human, unit:u, charged: waived?0:u*qty });
+      lines.push({ name:c.name, qty, unit:u, sub:u*qty, waived });
+    }
+  });
+  const fee = w.inW ? 0 : INSPECT_FEE;
+  const total = parts.reduce((t,p)=>t+p.charged,0) + fee;
+  r.repair = { date, staff, parts, report,
+    attachments:[...($('wk_file').files||[])].map(f=>f.name),
+    internalNote: $('wk_note').value.trim() };
+  r.quote = { lines, fee, total, sentAt:Date.now() };
+  r.status = 'quoted';
+  notify([r.byRole], `📄 ${rid} 報價單已發送（Email/LINE）`, `維修報價 ${money(total)}，請確認是否同意維修並回覆取件方式。`, rid);
+  save(); toast('✅ 維修報告已提交，系統已自動發送報價單（階段 4）'); render(); refreshModal();
+}
+
+/* 階段 5 UI */
+function decUI(rid){
+  const r = state.repairs.find(x=>x.id===rid);
+  const w = warranty(r.shipDate);
+  const d = document.querySelector('input[name=dc_d]:checked')?.value;
+  const amt = d==='agree' ? r.quote.total : ((w && !w.inW) ? INSPECT_FEE : 0);
+  $('dcPay').innerHTML = amt>0 ? `<div class="infobox mt"><b>應付金額 ${money(amt)}</b>
+    <div class="mt flexrow">
+      <label class="opt"><input type="radio" name="dc_pm" value="linepay" checked onchange="decPayUI()"> LinePay QRcode</label>
+      <label class="opt"><input type="radio" name="dc_pm" value="bank" onchange="decPayUI()"> 匯款帳號</label>
+    </div>
+    <div id="dcPmBox" class="mt flexrow">${QR_SVG}<div class="note">請掃描 QRcode 完成 LinePay 付款（Demo 示意）</div></div>
+    <div class="grid2 mt">
+      <div class="field"><span>付款日期 *</span><input type="date" id="dc_pd" value="${todayISO()}" style="width:100%"></div>
+      <div class="field"><span id="dcRefLbl">LinePay 編號 *</span><input id="dc_ref" style="width:100%"></div>
+      <div class="field"><span>上傳交易截圖</span><input type="file" id="dc_shot"></div>
+    </div>
+    <div class="field"><span>發票是否開立統編</span>
+      <label class="opt"><input type="radio" name="dc_iv" value="n" checked onchange="$('dc_tax').style.display='none'"> 否</label>
+      <label class="opt"><input type="radio" name="dc_iv" value="y" onchange="$('dc_tax').style.display='inline-block'"> 是</label>
+      <input id="dc_tax" placeholder="統編號碼" style="display:none;width:140px">
+    </div></div>` : `<div class="okbox mt">保固內免費／放棄免費：無需付款，直接選擇取件方式。</div>`;
+}
+function decPayUI(){
+  const m = document.querySelector('input[name=dc_pm]:checked')?.value;
+  $('dcPmBox').innerHTML = m==='linepay'
+    ? `${QR_SVG}<div class="note">請掃描 QRcode 完成 LinePay 付款（Demo 示意）</div>`
+    : `<div class="infobox">匯款帳號：808 玉山銀行　1234-567-890123<br><span class="note">戶名：寶傑股份有限公司</span></div>`;
+  $('dcRefLbl').textContent = m==='linepay' ? 'LinePay 編號 *' : '轉帳後五碼 *';
+}
+function decPkUI(){
+  const v = document.querySelector('input[name=dc_pk]:checked')?.value;
+  let h = '';
+  if(v==='north') h = `<div class="infobox">📍 ${OFFICES.north.name}：${OFFICES.north.addr}</div>`;
+  if(v==='office') h = `<div class="infobox">
+    <label class="opt"><input type="radio" name="dc_off" value="central" checked> ${OFFICES.central.name}（${OFFICES.central.addr}）</label>
+    <label class="opt"><input type="radio" name="dc_off" value="south"> ${OFFICES.south.name}（${OFFICES.south.addr}）</label></div>`;
+  if(v==='courier') h = `<div class="infobox">收件地址：<input id="dc_pkaddr" style="width:300px"></div>`;
+  $('dcPkBox').innerHTML = h;
+}
+function submitDecision(rid){
+  const r = state.repairs.find(x=>x.id===rid);
+  const w = warranty(r.shipDate);
+  const d = document.querySelector('input[name=dc_d]:checked')?.value;
+  if(!d) return toast('請選擇【同意維修】或【放棄維修】');
+  const pk = document.querySelector('input[name=dc_pk]:checked')?.value;
+  if(!pk) return toast('請選擇取件方式');
+  const pickup = { method:pk };
+  if(pk==='office') pickup.office = document.querySelector('input[name=dc_off]:checked')?.value || 'central';
+  if(pk==='courier'){ pickup.addr = $('dc_pkaddr').value.trim(); if(!pickup.addr) return toast('請填寫收件地址'); }
+  const amt = d==='agree' ? r.quote.total : ((w && !w.inW) ? INSPECT_FEE : 0);
+  r.decision = d; r.pickup = pickup; r.payAmount = amt;
+  if(amt>0){
+    const pm = document.querySelector('input[name=dc_pm]:checked')?.value || 'linepay';
+    const ref = $('dc_ref').value.trim();
+    if(!$('dc_pd').value || !ref) return toast('請回填付款日期與'+(pm==='linepay'?'LinePay 編號':'轉帳後五碼'));
+    const ivNeed = document.querySelector('input[name=dc_iv]:checked')?.value==='y';
+    if(ivNeed && !$('dc_tax').value.trim()) return toast('請填寫統編號碼');
+    r.payment = { method:pm, date:$('dc_pd').value, ref,
+      shot: $('dc_shot').files[0]?.name || '', invoice:{ need:ivNeed, taxId:$('dc_tax').value.trim() } };
+    r.status = 'paid';
+    notify(['finance'], `💰 ${rid} 已回填付款資訊`, `${d==='agree'?'同意維修':'放棄維修（檢測費）'} ${money(amt)}，請對帳確認。`, rid);
+    toast('✅ 已送出，等待財務對帳');
+  } else {
+    r.status = 'reconciled';
+    notify(['receiver','tech'], `📦 ${rid} 可安排取件／寄送`, `客戶已回覆（${d==='agree'?'同意維修':'放棄維修'}，免付款），請安排交件。`, rid);
+    toast('✅ 已送出，等待安排取件');
+  }
+  save(); render(); refreshModal();
+}
+
+function doReconRepair(id){
+  const r = state.repairs.find(x=>x.id===id);
+  const staff = $('fn_staff').value.trim();
+  if(!staff) return toast('請填寫核帳人員姓名');
+  if(!$('fn_ok').checked) return toast('⚠️ 防呆：請勾選「確認核帳」');
+  r.account = { staff, ts:Date.now(), ivd:$('fn_ivd').value, ivn:$('fn_ivn').value.trim() };
+  r.status = 'reconciled';
+  notify(['receiver','tech'], `📦 ${id} 對帳完成`, `請依取件方式安排：${pickupText(r.pickup)}`, id);
+  notify([r.byRole], `✅ ${id} 對帳完成`, `款項已確認，將盡快安排${r.pickup.method==='courier'?'寄出':'取件'}。`, id);
+  save(); toast('✅ 對帳完成'); render(); refreshModal();
+}
+
+function sendPickupNotice(id){
+  const r = state.repairs.find(x=>x.id===id);
+  const t = $('cl_time').value, staff = $('cl_staff').value.trim();
+  if(!t || !staff) return toast('請填寫可取件時間與點交人員姓名');
+  r.notice = { raw:t, time:t.replace('T',' '), staff };
+  const place = r.pickup.method==='north' ? OFFICES.north : OFFICES[r.pickup.office];
+  notify([r.byRole], `🔔 ${id} 可取件通知`, `請於 ${r.notice.time} 至 ${place.name}（${place.addr}）取件，點交人員：${staff}。發票隨物品交件。`, id);
+  save(); toast('✅ 已通知客戶取件時間'); render(); refreshModal();
+}
+
+function closeRepair(id, mode){
+  const r = state.repairs.find(x=>x.id===id);
+  if(mode==='courier'){
+    const co = $('cl_cco').value.trim(), no = $('cl_ctn').value.trim();
+    if(!co || !no) return toast('請填寫物流公司與物流單號');
+    r.shipOut = { co, no };
+    notify([r.byRole], `🚚 ${id} 已寄出`, `${co}／${no}，維修單已結案。`, id);
+  } else {
+    const staff = ($('cl_staff')?.value||'').trim() || (r.notice?r.notice.staff:'');
+    if(!staff) return toast('請填寫點交人員姓名');
+    if(!r.notice){ const t = $('cl_time').value; if(t) r.notice = { raw:t, time:t.replace('T',' '), staff }; else r.notice = { raw:'', time:'現場點交', staff }; }
+    r.notice.staff = staff;
+    notify([r.byRole], `✅ ${id} 點交完成`, `維修單已結案，感謝您的支持。`, id);
+  }
+  /* 結案：正式扣減分倉庫存（同意維修才消耗零件） */
+  if(r.decision==='agree' && r.repair){
+    r.repair.parts.forEach(p=>{
+      adjustPart(p.id, 'north', -p.qty, '維修消耗', r.repair.staff, r.id, '維修零件出庫');
+    });
+  }
+  r.status = 'closed'; r.closedAt = Date.now();
+  save(); toast('✅ ' + id + ' 已結案' + (r.decision==='agree'?'，庫存已自動扣減':'')); render(); refreshModal();
+}
+
+/* ============== 販售單詳情 ============== */
+function saleDeliveryText(d){
+  if(d.method==='pickup') return `${OFFICES[d.office].name}自取（${OFFICES[d.office].addr}）`;
+  return `${esc(d.shipVia)}寄件（收件地址：${esc(d.addr)}，運費 ${money(SHIP_FEE)}）`;
+}
+function saleDetailHTML(s){
+  const [stTxt, stCls] = SSTATUS[s.status];
+  const isOrderer = ['customer','sales'].includes(state.role);
+  let h = `<h3>販售訂單 ${s.id} <span class="badge ${stCls}">${stTxt}</span></h3>
+  ${stepperHTML(SSTEPS, SDONE[s.status])}
+  <div class="sec"><h4>🛒 訂單內容（步驟 1）</h4><div class="kv">
+    <b>購買人</b>${esc(s.buyer.name)}／${esc(s.buyer.phone)}（${ROLES[s.byRole]}）　<b>下單時間</b>${fmtDT(s.createdAt)}<br>
+    <b>取件方式</b>${saleDeliveryText(s.delivery)}</div>
+  <table><thead><tr><th>品項</th><th>下單時狀態</th><th>單價</th><th>數量</th><th class="right">小計</th></tr></thead><tbody>
+    ${s.items.map(i=>`<tr><td>${cat(i.id).name}</td><td>${i.front==='預購'?'<span class="badge b-amber">預購</span>':'<span class="badge b-green">現貨</span>'}</td><td>${money(i.unit)}</td><td>${i.qty}</td><td class="right">${money(i.unit*i.qty)}</td></tr>`).join('')}
+    ${s.shipFee?`<tr><td colspan="4">運費（貨運/郵局）</td><td class="right">${money(s.shipFee)}</td></tr>`:''}
+    <tr><td colspan="4"><b>總計</b></td><td class="right"><b>${money(s.total)}</b></td></tr>
+  </tbody></table></div>`;
+
+  /* 步驟 2：付款 */
+  if(s.status==='pending_payment'){
+    h += `<div class="sec"><h4>💳 完成付款（步驟 2）</h4>`;
+    if(isOrderer){
+      h += `<div class="infobox"><b>應付金額 ${money(s.total)}</b>
+      <div class="mt flexrow">
+        <label class="opt"><input type="radio" name="sp_pm" value="linepay" checked onchange="spPayUI()"> LinePay QRcode</label>
+        <label class="opt"><input type="radio" name="sp_pm" value="bank" onchange="spPayUI()"> 匯款帳號</label>
+      </div>
+      <div id="spPmBox" class="mt flexrow">${QR_SVG}<div class="note">請掃描 QRcode 完成 LinePay 付款（Demo 示意）</div></div>
+      <div class="grid2 mt">
+        <div class="field"><span>付款日期 *</span><input type="date" id="sp_pd" value="${todayISO()}" style="width:100%"></div>
+        <div class="field"><span id="spRefLbl">LinePay 編號 *</span><input id="sp_ref" style="width:100%"></div>
+        <div class="field"><span>上傳交易截圖</span><input type="file" id="sp_shot"></div>
+      </div>
+      <div class="field"><span>發票是否開立統編</span>
+        <label class="opt"><input type="radio" name="sp_iv" value="n" checked onchange="$('sp_tax').style.display='none'"> 否</label>
+        <label class="opt"><input type="radio" name="sp_iv" value="y" onchange="$('sp_tax').style.display='inline-block'"> 是</label>
+        <input id="sp_tax" placeholder="統編號碼" style="display:none;width:140px">
+      </div>
+      <button class="btn green" onclick="paySale('${s.id}')">回填付款資訊</button></div>`;
+    } else h += `<p class="note">等待「客戶／業務」完成付款。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+  if(s.payment){
+    h += `<div class="sec"><h4>💳 付款資訊（步驟 2）</h4><div class="kv">${payText(s.payment)}</div></div>`;
+  }
+
+  /* 步驟 3：對帳 */
+  if(s.status==='pending_recon'){
+    h += `<div class="sec"><h4>💰 對帳確認（步驟 3）</h4>`;
+    if(state.role==='finance'){
+      h += `<div class="grid2">
+        <div class="field"><span>核帳人員姓名 *</span><input id="sf_staff" style="width:100%"></div>
+        <div class="field"><span>發票開立日期</span><input type="date" id="sf_ivd" value="${todayISO()}" style="width:100%"></div>
+        <div class="field"><span>發票號碼</span><input id="sf_ivn" placeholder="AB-12345678" style="width:100%"></div>
+      </div>
+      <label class="opt"><input type="checkbox" id="sf_ok"> <b>確認核帳</b>（金流已核對無誤）</label>
+      <div class="mt"><button class="btn" onclick="doReconSale('${s.id}')">完成對帳</button></div>`;
+    } else h += `<p class="note">等待「核帳/財務人員」對帳。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+  if(s.account){
+    h += `<div class="sec"><h4>🧾 核帳記錄</h4><div class="kv"><b>核帳人員</b>${esc(s.account.staff)}　<b>時間</b>${fmtDT(s.account.ts)}　<b>發票</b>${s.account.ivn?fmtDate(s.account.ivd)+'／'+esc(s.account.ivn):'未開立'}</div></div>`;
+  }
+
+  /* 步驟 4：控存收單備貨 */
+  const hasPre = s.items.some(i=>frontStatus(i.id)==='預購' || i.front==='預購');
+  if(s.status==='pending_stock'){
+    h += `<div class="sec"><h4>📦 收單／預購審查（步驟 4）</h4>`;
+    if(state.role==='stock'){
+      h += hasPre ? `<div class="warnbox">⚠️ 本訂單含<b>預購</b>商品，請判斷是否補貨或向其它區域辦事處調貨後再確認收單。</div>` : `<div class="okbox">本訂單皆為現貨，庫存充足。</div>`;
+      h += `<table><thead><tr><th>品項</th><th>需求</th><th>北部</th><th>中部</th><th>南部</th><th>前台狀態</th></tr></thead><tbody>
+      ${s.items.map(i=>{
+        const e = state.inv.parts[i.id];
+        return `<tr><td>${cat(i.id).name}</td><td>${i.qty}</td>
+          ${WHS.map(w=>`<td class="${e[w].q<=e[w].s?'low':''}">${e[w].q}<span class="note">/安${e[w].s}</span></td>`).join('')}
+          <td>${fsBadge(i.id)}</td></tr>`;
+      }).join('')}</tbody></table>
+      <div class="grid2 mt">
+        <div class="field"><span>控存人員姓名 *</span><input id="sr_staff" style="width:100%"></div>
+        <div class="field"><span>庫存處置</span><select id="sr_act" style="width:100%">
+          <option>庫存足夠，直接出貨</option><option>已安排補貨（向廠商進貨）</option>
+          <option>已向中部辦事處調貨</option><option>已向南部辦事處調貨</option></select></div>
+      </div>
+      ${s.delivery.method==='ship' ? `<div class="grid2">
+        <div class="field"><span>物流公司 *</span><input id="sr_cco" value="${esc(s.delivery.shipVia)}" style="width:100%"></div>
+        <div class="field"><span>物流單號 *</span><input id="sr_ctn" style="width:100%"></div></div>`
+      : `<div class="field"><span>可取件時間 *</span><input type="datetime-local" id="sr_time" style="width:100%"></div>`}
+      <button class="btn green" onclick="doStockReview('${s.id}')">確認收單，備貨完成（扣庫存＋自動通知）</button>`;
+    } else h += `<p class="note">等待「控存人員」收單備貨。（請切換角色操作）</p>`;
+    h += `</div>`;
+  }
+  if(s.review){
+    h += `<div class="sec"><h4>📦 備貨記錄（步驟 4-5）</h4><div class="kv">
+      <b>控存人員</b>${esc(s.review.staff)}　<b>處置</b>${esc(s.review.act)}　<b>時間</b>${fmtDT(s.review.ts)}<br>
+      ${s.shipOut?`<b>寄件</b>${esc(s.shipOut.co)}／${esc(s.shipOut.no)}`:`<b>可取件時間</b>${esc(s.pickupTime||'—')}`}<br>
+      <b>庫存</b>已自動扣減（見異動記錄，含訂單編號 ${s.id}）</div></div>`;
+  }
+  if(s.status==='ready'){
+    h += `<div class="sec"><div class="okbox">✅ 備貨完成，系統已自動發送${s.delivery.method==='ship'?'寄件':'自取'}通知。</div>
+    ${state.role==='stock'?`<button class="btn" onclick="closeSale('${s.id}')">交件完成，結案</button>`:''}</div>`;
+  }
+  if(s.status==='closed'){
+    h += `<div class="sec"><div class="okbox"><b>✅ 已結案</b>　${fmtDT(s.closedAt)}</div></div>`;
+  }
+  return h;
+}
+
+function spPayUI(){
+  const m = document.querySelector('input[name=sp_pm]:checked')?.value;
+  $('spPmBox').innerHTML = m==='linepay'
+    ? `${QR_SVG}<div class="note">請掃描 QRcode 完成 LinePay 付款（Demo 示意）</div>`
+    : `<div class="infobox">匯款帳號：808 玉山銀行　1234-567-890123<br><span class="note">戶名：寶傑股份有限公司</span></div>`;
+  $('spRefLbl').textContent = m==='linepay' ? 'LinePay 編號 *' : '轉帳後五碼 *';
+}
+function paySale(id){
+  const s = state.sales.find(x=>x.id===id);
+  const pm = document.querySelector('input[name=sp_pm]:checked')?.value || 'linepay';
+  const ref = $('sp_ref').value.trim();
+  if(!$('sp_pd').value || !ref) return toast('請回填付款日期與'+(pm==='linepay'?'LinePay 編號':'轉帳後五碼'));
+  const ivNeed = document.querySelector('input[name=sp_iv]:checked')?.value==='y';
+  if(ivNeed && !$('sp_tax').value.trim()) return toast('請填寫統編號碼');
+  s.payment = { method:pm, date:$('sp_pd').value, ref, shot:$('sp_shot').files[0]?.name||'', invoice:{ need:ivNeed, taxId:$('sp_tax').value.trim() } };
+  s.status = 'pending_recon';
+  notify(['finance'], `💰 ${id} 已回填付款資訊`, `販售訂單 ${money(s.total)}，請對帳確認。`, id);
+  save(); toast('✅ 付款資訊已送出，等待財務對帳'); render(); refreshModal();
+}
+function doReconSale(id){
+  const s = state.sales.find(x=>x.id===id);
+  const staff = $('sf_staff').value.trim();
+  if(!staff) return toast('請填寫核帳人員姓名');
+  if(!$('sf_ok').checked) return toast('⚠️ 防呆：請勾選「確認核帳」');
+  s.account = { staff, ts:Date.now(), ivd:$('sf_ivd').value, ivn:$('sf_ivn').value.trim() };
+  s.status = 'pending_stock';
+  const hasPre = s.items.some(i=>frontStatus(i.id)==='預購' || i.front==='預購');
+  notify(['stock'], `📦 ${id} 對帳完成，請收單備貨`, hasPre?'⚠️ 本單含預購商品，請判斷補貨或跨區調撥。':'商品皆為現貨，請撿貨打包。', id);
+  save(); toast('✅ 對帳完成，已通知控存收單'); render(); refreshModal();
+}
+function doStockReview(id){
+  const s = state.sales.find(x=>x.id===id);
+  const staff = $('sr_staff').value.trim();
+  if(!staff) return toast('請填寫控存人員姓名');
+  if(s.delivery.method==='ship'){
+    const co = $('sr_cco').value.trim(), no = $('sr_ctn').value.trim();
+    if(!co || !no) return toast('請填寫物流公司與物流單號');
+    s.shipOut = { co, no };
+  } else {
+    const t = $('sr_time').value;
+    if(!t) return toast('請填寫可取件時間');
+    s.pickupTime = t.replace('T',' ');
+  }
+  s.review = { staff, act:$('sr_act').value, ts:Date.now() };
+  /* 扣庫存：自取扣該辦事處倉，寄件扣北部倉 */
+  const wh = s.delivery.method==='pickup' ? s.delivery.office : 'north';
+  s.items.forEach(i=> adjustPart(i.id, wh, -i.qty, '販售出貨', staff, s.id, '配件販售'));
+  s.status = 'ready';
+  if(s.delivery.method==='ship'){
+    notify([s.byRole], `🚚 ${id} 已寄出（備貨完成）`, `${s.shipOut.co}／${s.shipOut.no}，請留意收件。`, id);
+  } else {
+    const o = OFFICES[s.delivery.office];
+    notify([s.byRole], `🔔 ${id} 備貨完成可取件`, `請於 ${s.pickupTime} 至 ${o.name}（${o.addr}）取件。`, id);
+  }
+  save(); toast('✅ 備貨完成，庫存已扣減並自動通知客戶'); render(); refreshModal();
+}
+function closeSale(id){
+  const s = state.sales.find(x=>x.id===id);
+  s.status = 'closed'; s.closedAt = Date.now();
+  notify([s.byRole], `✅ ${id} 已結案`, '感謝您的購買。', id);
+  save(); toast('✅ ' + id + ' 已結案'); render(); refreshModal();
+}
+
+/* ============== 庫存管理 ============== */
+const INV_TABS = { parts:'零件／販售配件', machines:'機器庫存', otherGoods:'其他物品', uniforms:'制服庫存', acEquip:'冷氣清潔設備', papers:'紙本與表單', demo:'Demo借用登記' };
+
+function vInventory(){
+  const pills = Object.entries(INV_TABS).map(([k,v])=>`<div class="pill ${state.invTab===k?'on':''}" onclick="setInvTab('${k}')">${v}</div>`).join('');
+  const body = {
+    parts:invParts, machines:()=>invArr('machines',true), otherGoods:()=>invArr('otherGoods',false),
+    uniforms:invUniforms, acEquip:()=>invArr('acEquip',true), papers:()=>invArr('papers',false), demo:invDemo,
+  }[state.invTab]();
+  return `<div class="card"><h3>🏬 庫存管理（北部／中部／南部分倉）</h3><div class="pill-tabs">${pills}</div>${body}</div>`;
+}
+
+function invParts(){
+  const lows = CATALOG.filter(c=>frontStatus(c.id)==='預購');
+  return `${lows.length?`<div class="warnbox">⚠️ <b>低庫存提醒</b>：${lows.map(c=>c.name).join('、')} 合計庫存 ≤ 安全庫存，前台已自動切換為「預購」。</div>`:''}
+  <p class="note">「安」＝該倉安全庫存量。合計 ≤ 安全庫存合計 → 前台自動轉「預購」。每筆異動皆需操作人員並寫入流水帳。</p>
+  <table><thead><tr><th>品項</th><th>北部</th><th>中部</th><th>南部</th><th>合計</th><th>前台狀態</th><th></th></tr></thead><tbody>
+  ${CATALOG.map(c=>{
+    const e = state.inv.parts[c.id], t = partTotals(c.id);
+    return `<tr><td>${c.name}</td>
+      ${WHS.map(w=>`<td class="${e[w].q<=e[w].s?'low':''}">${e[w].q}<span class="note">/安${e[w].s}</span></td>`).join('')}
+      <td><b>${t.q}</b><span class="note">/安${t.s}</span></td>
+      <td>${fsBadge(c.id)}</td>
+      <td><button class="btn sm ghost" onclick="openAdjust('parts','${c.id}')">異動</button></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function invArr(catKey, transit){
+  const rows = state[catKey];
+  return `<p class="note">${transit?'調撥自北部出發時進入「運送中」，需按「到貨」確認入倉。':''}每筆異動皆記錄操作人員與時間戳。</p>
+  <table><thead><tr><th>品項</th><th>北部</th><th>中部</th><th>南部</th>${transit?'<th>運送中(北→中)</th><th>運送中(北→南)</th>':''}<th>合計</th><th></th></tr></thead><tbody>
+  ${rows.map((r,i)=>{
+    const total = r.north + r.central + r.south + (transit ? (r.tNC + r.tNS) : 0);
+    return `<tr><td>${r.name}</td><td>${r.north}</td><td>${r.central}</td><td>${r.south}</td>
+      ${transit?`<td>${r.tNC}${r.tNC>0?` <button class="btn sm ghost" onclick="confirmArrive('${catKey}',${i},'tNC')">到貨</button>`:''}</td>
+      <td>${r.tNS}${r.tNS>0?` <button class="btn sm ghost" onclick="confirmArrive('${catKey}',${i},'tNS')">到貨</button>`:''}</td>`:''}
+      <td><b>${total}</b></td>
+      <td><button class="btn sm ghost" onclick="openAdjust('${catKey}',${i})">異動</button></td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function invUniforms(){
+  let h = `<p class="note">款式 × 尺寸 × 地區。點「異動」記錄入庫／出庫（含操作人員與時間戳）。</p>
+  <div class="mt"><button class="btn sm" onclick="openUniAdjust()">＋ 制服異動</button></div>`;
+  WHS.forEach(rg=>{
+    const rows = state.uniforms.filter(u=>u.region===rg);
+    let regionTotal = 0;
+    h += `<h4>${WH_LABEL[rg]}</h4>
+    <table><thead><tr><th>款式</th>${UNI_SIZES.map(s=>`<th>${s}</th>`).join('')}<th>小計</th></tr></thead><tbody>
+    ${rows.map(u=>{
+      const sub = UNI_SIZES.reduce((t,s)=>t+u.sizes[s],0); regionTotal += sub;
+      return `<tr><td>${u.style}</td>${UNI_SIZES.map(s=>`<td>${u.sizes[s]}</td>`).join('')}<td><b>${sub}</b></td></tr>`;
+    }).join('')}
+    <tr><td><b>合計</b></td><td colspan="${UNI_SIZES.length}"></td><td><b>${regionTotal}</b></td></tr>
+    </tbody></table>`;
+  });
+  return h;
+}
+
+function invDemo(){
+  return `<p class="note">手抄登記本數位化：車上備機／Demo機租賃／借DEMO主機／借DEMO拍打頭。每筆自動記錄操作人員與時間戳（稽核用）。</p>
+  <h4>新增登記</h4>
+  <div class="flexrow">
+    <input type="date" id="dl_date" value="${todayISO()}">
+    <select id="dl_type"><option>車上備機</option><option>Demo機租賃</option><option>借DEMO主機</option><option>借DEMO拍打頭</option></select>
+    <input id="dl_person" placeholder="業務／借用人" style="width:130px">
+    <input type="number" id="dl_qty" value="1" min="1" style="width:64px">
+    <input id="dl_note" placeholder="備註" style="width:150px">
+    <input id="dl_staff" placeholder="操作人員 *" style="width:110px">
+    <button class="btn sm" onclick="addDemoLog()">登記</button>
+  </div>
+  <h4 class="mt">登記記錄</h4>
+  <table><thead><tr><th>日期</th><th>類型</th><th>業務／借用人</th><th>數量</th><th>備註</th><th>操作人員</th><th>時間戳</th></tr></thead><tbody>
+  ${state.demoLog.map(d=>`<tr><td>${fmtDate(d.date)}</td><td>${esc(d.type)}</td><td>${esc(d.person)}</td><td>${d.qty}</td><td>${esc(d.note||'—')}</td><td>${esc(d.staff)}</td><td class="note">${fmtDT(d.ts)}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+function addDemoLog(){
+  const staff = $('dl_staff').value.trim(), person = $('dl_person').value.trim();
+  if(!person || !staff) return toast('請填寫借用人與操作人員（稽核必填）');
+  state.demoLog.unshift({ date:$('dl_date').value, type:$('dl_type').value, person,
+    qty:Math.max(1,parseInt($('dl_qty').value)||1), note:$('dl_note').value.trim(), staff, ts:Date.now() });
+  save(); toast('✅ 已登記'); render();
+}
+
+/* ---- 異動 modal ---- */
+let adj = null;
+function openAdjust(catKey, key){
+  adj = { catKey, key };
+  const isParts = catKey==='parts';
+  const name = isParts ? cat(key).name : state[catKey][key].name;
+  const hasTransit = ['machines','acEquip'].includes(catKey);
+  openModal(`<h3>庫存異動：${name}</h3>
+  <p class="note">分類：${INV_TABS[catKey]}｜每筆異動寫入流水帳（含操作人員與時間戳）。</p>
+  <div class="grid2">
+    <div class="field"><span>異動類型 *</span><select id="aj_type" style="width:100%" onchange="adjUI()">
+      <option value="in">入庫（進倉點收）</option><option value="out">出庫</option>
+      <option value="move">調撥</option>${isParts?'<option value="safe">安全庫存設定</option>':''}
+    </select></div>
+    <div class="field"><span id="aj_whLbl">倉別（進倉位置）*</span><select id="aj_wh" style="width:100%">
+      ${WHS.map(w=>`<option value="${w}">${WH_LABEL[w]}倉庫</option>`).join('')}</select></div>
+    <div class="field" id="aj_toBox" style="display:none"><span>調撥至 *</span><select id="aj_to" style="width:100%">
+      ${WHS.map(w=>`<option value="${w}">${WH_LABEL[w]}倉庫</option>`).join('')}</select>
+      ${hasTransit?'<div class="note">自北部調出將進入「運送中」，需按「到貨」確認。</div>':''}</div>
+    <div class="field"><span id="aj_qtyLbl">數量 *</span><input type="number" id="aj_qty" value="1" min="0" style="width:100%"></div>
+    <div class="field"><span>進倉／異動日期</span><input type="date" id="aj_date" value="${todayISO()}" style="width:100%"></div>
+    <div class="field"><span>點收／操作人員姓名 *</span><input id="aj_staff" style="width:100%"></div>
+    <div class="field"><span>型號／序號登錄</span><input id="aj_sn" placeholder="唯一序號或型號（選填）" style="width:100%"></div>
+    <div class="field"><span>備註（購買者資料／關聯單號）</span><input id="aj_note" style="width:100%"></div>
+  </div>
+  <button class="btn" onclick="submitAdjust()">確認異動</button>`);
+}
+function adjUI(){
+  const t = $('aj_type').value;
+  $('aj_toBox').style.display = t==='move' ? '' : 'none';
+  $('aj_whLbl').textContent = t==='move' ? '調撥自 *' : (t==='in' ? '倉別（進倉位置）*' : '倉別 *');
+  $('aj_qtyLbl').textContent = t==='safe' ? '安全庫存量設定值 *' : '數量 *';
+}
+function submitAdjust(){
+  const { catKey, key } = adj;
+  const t = $('aj_type').value, wh = $('aj_wh').value, staff = $('aj_staff').value.trim();
+  const q = parseInt($('aj_qty').value);
+  const sn = $('aj_sn').value.trim(), noteIn = $('aj_note').value.trim();
+  if(!staff) return toast('請填寫操作人員姓名（稽核必填）');
+  if(isNaN(q) || q<0 || (t!=='safe' && q===0)) return toast('請填寫有效數量');
+  const note = [sn?('序號:'+sn):'', noteIn].filter(Boolean).join('｜');
+  if(catKey==='parts'){
+    if(t==='safe'){
+      state.inv.parts[key][wh].s = q;
+      logTxn('安全庫存設定', cat(key).name, WH_LABEL[wh], q, staff, '', note||'設定安全庫存值');
+      if(frontStatus(key)==='預購') notify(['stock'],'⚠️ 低庫存提醒',`「${cat(key).name}」合計庫存 ≤ 新安全庫存量，前台已切為「預購」。`,null);
+    }
+    else if(t==='in') adjustPart(key, wh, q, '入庫', staff, '', note);
+    else if(t==='out') adjustPart(key, wh, -q, '出庫', staff, '', note);
+    else {
+      const to = $('aj_to').value;
+      if(to===wh) return toast('調撥來源與目的不可相同');
+      adjustPart(key, wh, -q, '調撥', staff, '', `調出至${WH_LABEL[to]}${note?'｜'+note:''}`);
+      adjustPart(key, to, q, '調撥', staff, '', `自${WH_LABEL[wh]}調入${note?'｜'+note:''}`);
+    }
+  } else {
+    const row = state[catKey][key];
+    const hasTransit = ['machines','acEquip'].includes(catKey);
+    if(t==='in'){ row[wh]+=q; logTxn('入庫', row.name, WH_LABEL[wh], q, staff, '', note); }
+    else if(t==='out'){ row[wh]-=q; logTxn('出庫', row.name, WH_LABEL[wh], -q, staff, '', note); }
+    else {
+      const to = $('aj_to').value;
+      if(to===wh) return toast('調撥來源與目的不可相同');
+      if(row[wh]<q) return toast('來源倉庫存不足');
+      row[wh]-=q;
+      if(hasTransit && wh==='north' && to!=='north'){
+        row[to==='central'?'tNC':'tNS'] += q;
+        logTxn('調撥(運送中)', row.name, `北部→${WH_LABEL[to]}`, -q, staff, '', note||'運送中，待到貨確認');
+      } else {
+        row[to]+=q;
+        logTxn('調撥', row.name, `${WH_LABEL[wh]}→${WH_LABEL[to]}`, q, staff, '', note);
+      }
+    }
+  }
+  save(); toast('✅ 異動完成，已寫入流水帳'); closeModal(); render();
+}
+function confirmArrive(catKey, i, field){
+  const staff = prompt('到貨點收人員姓名：'); if(!staff) return;
+  const row = state[catKey][i];
+  const q = row[field], to = field==='tNC' ? 'central' : 'south';
+  row[field] = 0; row[to] += q;
+  logTxn('到貨入倉', row.name, WH_LABEL[to], q, staff, '', '調撥運送到貨');
+  save(); toast('✅ 到貨入倉完成'); render();
+}
+
+function openUniAdjust(){
+  openModal(`<h3>制服庫存異動</h3>
+  <div class="grid2">
+    <div class="field"><span>類型 *</span><select id="ua_type" style="width:100%"><option value="in">入庫</option><option value="out">出庫</option></select></div>
+    <div class="field"><span>地區 *</span><select id="ua_rg" style="width:100%">${WHS.map(w=>`<option value="${w}">${WH_LABEL[w]}</option>`).join('')}</select></div>
+    <div class="field"><span>款式 *</span><select id="ua_st" style="width:100%">${UNI_STYLES.map(s=>`<option>${s}</option>`).join('')}</select></div>
+    <div class="field"><span>尺寸 *</span><select id="ua_sz" style="width:100%">${UNI_SIZES.map(s=>`<option>${s}</option>`).join('')}</select></div>
+    <div class="field"><span>數量 *</span><input type="number" id="ua_qty" value="1" min="1" style="width:100%"></div>
+    <div class="field"><span>操作人員 *</span><input id="ua_staff" style="width:100%"></div>
+  </div>
+  <button class="btn" onclick="submitUniAdjust()">確認異動</button>`);
+}
+function submitUniAdjust(){
+  const staff = $('ua_staff').value.trim();
+  if(!staff) return toast('請填寫操作人員姓名');
+  const q = Math.max(1, parseInt($('ua_qty').value)||1);
+  const rg = $('ua_rg').value, st = $('ua_st').value, sz = $('ua_sz').value;
+  const row = state.uniforms.find(u=>u.region===rg && u.style===st);
+  const delta = $('ua_type').value==='in' ? q : -q;
+  if(row.sizes[sz]+delta < 0) return toast('庫存不足');
+  row.sizes[sz] += delta;
+  logTxn(delta>0?'入庫':'出庫', `制服 ${st} ${sz}`, WH_LABEL[rg], delta, staff, '', '');
+  save(); toast('✅ 制服異動完成'); closeModal(); render();
+}
+
+/* ============== 價目表維護 ============== */
+function vPricing(){
+  return `<div class="card"><h3>💲 全局價目表維護（Master Data）</h3>
+  <p class="note">維修模組與販售模組共同調用。<span class="badge b-red">待補</span> 項目請輸入初始值後儲存，維修工作台即可勾選。</p>
+  <table><thead><tr><th>物品/零件名稱</th><th>業務販售/維修金額</th><th>客戶販售/維修金額</th><th>備註</th><th></th></tr></thead><tbody>
+  ${CATALOG.map(c=>{
+    const p = state.pricing[c.id];
+    const tbd = p.biz==null;
+    return `<tr ${tbd?'style="background:#fff8f0"':''}>
+      <td>${c.name} ${tbd?'<span class="badge b-red">待補</span>':''}</td>
+      <td><input type="number" id="pr_b_${c.id}" value="${p.biz==null?'':p.biz}" placeholder="待補" style="width:110px;padding:5px 8px"></td>
+      <td>${c.cust==null&&c.bizOnly?'<span class="note">—（業務專用）</span>':`<input type="number" id="pr_c_${c.id}" value="${p.cust==null?'':p.cust}" placeholder="待補" style="width:110px;padding:5px 8px">`}</td>
+      <td class="note">${c.note||(c.bizOnly?'業務專用品項':'')}</td>
+      <td><button class="btn sm" onclick="savePrice('${c.id}')">儲存</button></td></tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+function savePrice(id){
+  const c = cat(id);
+  const b = $('pr_b_'+id).value, ce = $('pr_c_'+id);
+  state.pricing[id].biz = b==='' ? null : Number(b);
+  if(ce) state.pricing[id].cust = ce.value==='' ? null : Number(ce.value);
+  else state.pricing[id].cust = null;
+  save(); toast(`✅ 已更新「${c.name}」價格`); render();
+}
+
+/* ============== 異動記錄 ============== */
+function vTxns(){
+  return `<div class="card"><h3>📒 庫存異動流水帳</h3>
+  <p class="note">入庫／出庫／調撥／維修消耗／販售出貨全記錄，含操作人員、時間戳與關聯單號（稽核用）。</p>
+  <table><thead><tr><th>時間戳</th><th>類型</th><th>品項</th><th>倉別</th><th>數量±</th><th>操作人員</th><th>關聯單號</th><th>備註</th></tr></thead><tbody>
+  ${state.txns.length?state.txns.map(t=>`<tr>
+    <td class="note">${fmtDT(t.ts)}</td>
+    <td><span class="badge ${t.delta>0?'b-green':(t.type.includes('調撥')?'b-blue':'b-red')}">${t.type}</span></td>
+    <td>${esc(t.item)}</td><td>${esc(t.wh)}</td>
+    <td class="${t.delta<0?'low':''}">${t.delta>0?'+':''}${t.delta}</td>
+    <td>${esc(t.staff)}</td>
+    <td>${t.ref?`<a href="javascript:openRef('${t.ref}')">${t.ref}</a>`:'—'}</td>
+    <td class="note">${esc(t.note||'—')}</td></tr>`).join(''):'<tr><td colspan="8" class="note">尚無異動記錄。</td></tr>'}
+  </tbody></table></div>`;
+}
+
+/* ============== 初始化 ============== */
+if(!load()) seed();
+render();
+
+</script>
+</body>
+</html>
